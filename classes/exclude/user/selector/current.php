@@ -39,16 +39,6 @@ require_once($CFG->dirroot . '/user/selector/lib.php');
 class current extends \user_selector_base {
 
     /**
-     * Create a new instance.
-     *
-     * @param string $name the control name/id for use in the HTML.
-     * @param array $options other options needed to construct this selector.
-     */
-    public function __construct($name, $options) {
-        parent::__construct($name, $options);
-    }
-
-    /**
      * Candidate users
      * @param string $search
      * @return array

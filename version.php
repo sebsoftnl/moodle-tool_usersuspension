@@ -27,7 +27,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 $plugin = new stdClass();
-$plugin->version   = 2015042000;
+$plugin->version   = 2015042001;
 $plugin->release   = '2.7.0';
 $plugin->requires  = 2014051200; // YYYYMMDDHH (This is the release version for Moodle 2.7).
 $plugin->cron      = 0;
