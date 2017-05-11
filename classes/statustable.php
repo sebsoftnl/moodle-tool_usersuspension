@@ -24,6 +24,8 @@
  */
 
 namespace tool_usersuspension;
+
+defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir . '/tablelib.php');
 
 /**
@@ -166,7 +168,7 @@ class statustable extends \table_sql {
      * @param bool $useinitialsbar
      */
     protected function render_statusses($pagesize, $useinitialsbar = true) {
-        global $DB;  /* @var $DB \moodle_database */
+        global $DB;
         $this->define_columns(array('username', 'name', 'lastlogin', 'timemodified', 'action'));
         $this->define_headers(array(
             get_string('thead:username', 'tool_usersuspension'),
@@ -191,7 +193,7 @@ class statustable extends \table_sql {
      * @param bool $useinitialsbar
      */
     protected function render_suspended($pagesize, $useinitialsbar = true) {
-        global $DB;  /* @var $DB \moodle_database */
+        global $DB;
         $this->define_columns(array('username', 'name', 'lastlogin', 'timemodified', 'action'));
         $this->define_headers(array('username', 'name', 'lastlogin', 'timemodified', 'action'));
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
@@ -211,7 +213,7 @@ class statustable extends \table_sql {
      * @param bool $useinitialsbar
      */
     protected function render_to_suspend($pagesize, $useinitialsbar = true) {
-        global $DB;  /* @var $DB \moodle_database */
+        global $DB;
         $this->define_columns(array('username', 'name', 'timedetect', 'suspendin', 'action'));
         $this->define_headers(array('username', 'name', 'timedetect', 'suspendin', 'action'));
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
@@ -230,7 +232,7 @@ class statustable extends \table_sql {
      * @param bool $useinitialsbar
      */
     protected function render_to_delete($pagesize, $useinitialsbar = true) {
-        global $DB;  /* @var $DB \moodle_database */
+        global $DB;
         $this->define_columns(array('username', 'name', 'timedetect', 'deletein', 'action'));
         $this->define_headers(array('username', 'name', 'timedetect', 'deletein', 'action'));
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .

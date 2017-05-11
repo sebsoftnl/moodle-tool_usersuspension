@@ -25,6 +25,8 @@
 
 namespace tool_usersuspension\forms\exclude;
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -42,8 +44,7 @@ class cohort extends \moodleform {
      * form definition
      */
     public function definition() {
-        global $CFG, $DB;
-        /* @var $DB \moodle_database */
+        global $DB;
         $mform = $this->_form;
 
         $excludedcohorts = $DB->get_fieldset_select('tool_usersuspension_excl', 'refid', 'type = ?', array('cohort'));

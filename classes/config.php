@@ -25,6 +25,8 @@
 
 namespace tool_usersuspension;
 
+defined('MOODLE_INTERNAL') || die;
+
 /**
  * tool_usersuspension\config
  *

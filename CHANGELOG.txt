@@ -1,0 +1,4 @@
+Version 3.0.0 (build 2017050100)
+* Code overhaul to comply to Moodle standards
+* Validated functionality for Moodle 3.0 onwards
+* Minimum required Moodle version: 3.0

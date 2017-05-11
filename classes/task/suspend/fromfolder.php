@@ -24,6 +24,8 @@
  */
 
 namespace tool_usersuspension\task\suspend;
+
+defined('MOODLE_INTERNAL') || die;
 use tool_usersuspension\config;
 use tool_usersuspension\processor\csv as csvprocessor;
 

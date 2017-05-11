@@ -25,6 +25,8 @@
 
 namespace tool_usersuspension\processor;
 
+defined('MOODLE_INTERNAL') || die;
+
 /**
  * Description of csv
  *
@@ -62,7 +64,7 @@ class csv {
      */
     protected $fh;
     /**
-     * Notification handler. 
+     * Notification handler.
      * Should be a callable that takes a single string argument
      * @var \callable
      */

@@ -24,6 +24,8 @@
  */
 
 namespace tool_usersuspension;
+
+defined('MOODLE_INTERNAL') || die;
 use tool_usersuspension\statustable;
 
 /**
@@ -642,12 +644,12 @@ class util {
             new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php', $params),
                 get_string('table:exclusions', 'tool_usersuspension'));
         $exclusions->subtree[] = self::pictabobject('excludeaddcohort', null, 'tool_usersuspension',
-            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php', $params +
-                    array('action' => 'add', 'addtype' => 'cohort', 'sesskey' => sesskey())),
+            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php',
+                    $params + array('action' => 'add', 'addtype' => 'cohort', 'sesskey' => sesskey())),
                 get_string('action:exclude:add:cohort', 'tool_usersuspension'));
         $exclusions->subtree[] = self::pictabobject('excludeadduser', null, 'tool_usersuspension',
-            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php', $params +
-                    array('action' => 'add', 'addtype' => 'user', 'sesskey' => sesskey())),
+            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php',
+                    $params + array('action' => 'add', 'addtype' => 'user', 'sesskey' => sesskey())),
                 get_string('action:exclude:add:user', 'tool_usersuspension'));
         $tabs[] = $exclusions;
         // Add statuslist tabs.

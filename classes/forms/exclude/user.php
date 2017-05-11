@@ -25,6 +25,8 @@
 
 namespace tool_usersuspension\forms\exclude;
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->libdir . '/formslib.php');
 
 /**
@@ -53,13 +55,11 @@ class user extends \moodleform {
      * form definition
      */
     public function definition() {
-        global $CFG, $DB;
         global $OUTPUT;
         // Create the user selector objects.
         $options = array('accesscontext' => \context_system::instance());
         $this->currentuserselector = new \tool_usersuspension\exclude\user\selector\current('removeselect', $options);
         $this->potentialuserselector = new \tool_usersuspension\exclude\user\selector\potential('addselect', $options);
-        /* @var $DB \moodle_database */
         $mform = $this->_form;
         // This element is only here so the form will actually get submitted.
         $mform->addElement('hidden', 'processor', 1);
