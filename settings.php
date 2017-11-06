@@ -33,9 +33,9 @@ if ($hassiteconfig) {
     $temp = new admin_settingpage('suspensionsettings', new lang_string('suspensionsettings', 'tool_usersuspension'));
     // Header.
     $image = '<a href="http://www.sebsoft.nl" target="_new"><img src="' .
-            $OUTPUT->pix_url('logo', 'tool_usersuspension') . '" /></a>&nbsp;&nbsp;&nbsp;';
+            $OUTPUT->image_url('logo', 'tool_usersuspension') . '" /></a>&nbsp;&nbsp;&nbsp;';
     $donate = '<a href="https://customerpanel.sebsoft.nl/sebsoft/donate/intro.php" target="_new"><img src="' .
-            $OUTPUT->pix_url('donate', 'tool_usersuspension') . '" /></a>';
+            $OUTPUT->image_url('donate', 'tool_usersuspension') . '" /></a>';
     $header = '<div class="tool-usersuspension-logopromo">' . $image . $donate . '</div>';
     $temp->add(new admin_setting_heading('tool_usersuspension_logopromo',
             get_string('promo', 'tool_usersuspension'),

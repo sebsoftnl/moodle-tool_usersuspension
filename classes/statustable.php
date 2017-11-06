@@ -357,7 +357,7 @@ class statustable extends \table_sql {
     protected function get_action_image($action) {
         global $OUTPUT;
         $actionstr = 'str' . $action;
-        return '<img src="' . $OUTPUT->pix_url($action, 'tool_usersuspension') .
+        return '<img src="' . $OUTPUT->image_url($action, 'tool_usersuspension') .
                 '" title="' . $this->{$actionstr} . '"/>';
     }
 

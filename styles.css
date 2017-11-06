@@ -23,29 +23,29 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 div.tool-usersuspension-warning {
-    font-size: 20pt;
+    font-size: 1.6em;
     color: black;
-    background-color: #ffaa00;
+    background-color: #fa0;
     padding: 10px;
 }
 div.tool-usersuspension-logopromo a img {
     height: 37px;
 }
 div.tool-usersuspension-notification-error {
-    font-size: 12pt;
+    font-size: 1em;
     padding: 10px;
-    color: #660000;
-    background-color: #ffbbbb;
+    color: #600;
+    background-color: #fbb;
 }
 div.tool-usersuspension-notification-success {
-    font-size: 12pt;
+    font-size: 1em;
     padding: 10px;
-    color: #006600;
-    background-color: #bbffbb;
+    color: #060;
+    background-color: #bfb;
 }
 div.tool-usersuspension-notification-warn {
-    font-size: 12pt;
+    font-size: 1em;
     padding: 10px;
-    color: #000000;
-    background-color: #bbbbff;
+    color: #000;
+    background-color: #bbf;
 }

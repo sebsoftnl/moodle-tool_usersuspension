@@ -586,7 +586,7 @@ class util {
      */
     public static function print_notification($msg, $class = 'success') {
         global $OUTPUT;
-        $pix = '<img src="' . $OUTPUT->pix_url('msg_' . $class, 'tool_usersuspension') . '"/>';
+        $pix = '<img src="' . $OUTPUT->image_url('msg_' . $class, 'tool_usersuspension') . '"/>';
         echo '<div class="tool-usersuspension-notification-' . $class . '">' . $pix . ' ' . $msg . '</div>';
     }
 
@@ -625,7 +625,7 @@ class util {
         global $OUTPUT;
         $img = '';
         if ($pix !== null) {
-            $img = '<img src="' . $OUTPUT->pix_url($pix, $component) . '"> ';
+            $img = '<img src="' . $OUTPUT->image_url($pix, $component) . '"> ';
         }
         return new \tabobject($id, $link, $img . $text, empty($title) ? $text : $title, $linkedwhenselected);
     }
