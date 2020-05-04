@@ -1,3 +1,7 @@
+Version 3.5.1 (build 2018050301)
+* Updated privacy provider.
+----------
+
 Version 3.5.0 (build 2018050300)
 * Added privacy provider
 * Validated functionality for Moodle 3.5 onwards

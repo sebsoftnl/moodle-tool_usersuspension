@@ -36,6 +36,8 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\transform;
 use core_privacy\local\request\writer;
+use core_privacy\local\request\userlist;
+use core_privacy\local\request\approved_userlist;
 
 /**
  * Privacy provider.
@@ -48,7 +50,8 @@ use core_privacy\local\request\writer;
  */
 class provider implements
         \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider {
+        \core_privacy\local\request\plugin\provider,
+        \core_privacy\local\request\core_userlist_provider {
 
     /**
      * Provides meta data that is stored about a user with tool_usersuspension
@@ -63,7 +66,8 @@ class provider implements
                 'type' => 'privacy:metadata:tool_usersuspension:type',
                 'refid' => 'privacy:metadata:tool_usersuspension:userid',
                 'timecreated' => 'privacy:metadata:tool_usersuspension:timecreated',
-            ]
+            ],
+            'privacy:metadata:tool_usersuspension_excl'
         );
         $collection->add_database_table(
             'tool_usersuspension_status',
@@ -73,7 +77,8 @@ class provider implements
                 'mailsent' => 'privacy:metadata:tool_usersuspension:mailsent',
                 'mailedto' => 'privacy:metadata:tool_usersuspension:mailedto',
                 'timecreated' => 'privacy:metadata:tool_usersuspension:timecreated',
-            ]
+            ],
+            'privacy:metadata:tool_usersuspension_status'
         );
         $collection->add_database_table(
             'tool_usersuspension_log',
@@ -83,7 +88,8 @@ class provider implements
                 'mailsent' => 'privacy:metadata:tool_usersuspension:mailsent',
                 'mailedto' => 'privacy:metadata:tool_usersuspension:mailedto',
                 'timecreated' => 'privacy:metadata:tool_usersuspension:timecreated',
-            ]
+            ],
+            'privacy:metadata:tool_usersuspension_log'
         );
         return $collection;
     }
@@ -242,4 +248,46 @@ class provider implements
             $DB->delete_records('tool_usersuspension_log', ['userid' => $user->id]);
         }
     }
+
+    /**
+     * Get the list of users who have data within a context.
+     *
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        global $DB;
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_SYSTEM) {
+            return;
+        }
+        // I'm unsure if we should also include the course contexts.
+        // I'm also unsure if we should include the cohort linked contexts.
+        // If we should, we'll implement those too.
+        // For now, include "all".
+        $userids1 = $DB->get_fieldset_sql('SELECT DISTINCT refid FROM {tool_usersuspension_excl} WHERE type = ?', ['user']);
+        $userids2 = $DB->get_fieldset_sql('SELECT DISTINCT userid FROM {tool_usersuspension_status}');
+        $userids3 = $DB->get_fieldset_sql('SELECT DISTINCT userid FROM {tool_usersuspension_log}');
+        $userids = array_unique(array_merge($userids1, $userids2, $userids3));
+        $userlist->add_users($userids);
+    }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param  approved_userlist $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+        $context = $userlist->get_context();
+        if ($context->contextlevel != CONTEXT_SYSTEM) {
+            return;
+        }
+
+        foreach ($userlist->get_userids() as $userid) {
+            $DB->delete_records('tool_usersuspension_excl', ['type' => 'user', 'refid' => $userid]);
+            $DB->delete_records('tool_usersuspension_status', ['userid' => $userid]);
+            $DB->delete_records('tool_usersuspension_log', ['userid' => $userid]);
+        }
+    }
+
 }

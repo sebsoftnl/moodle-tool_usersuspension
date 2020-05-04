@@ -215,3 +215,6 @@ $string['privacy:metadata:tool_usersuspension:status'] = 'Schorsingsstatus';
 $string['privacy:metadata:tool_usersuspension:mailsent'] = 'Of een email is verzonden naar de gebruiker';
 $string['privacy:metadata:tool_usersuspension:mailedto'] = 'E-mailadres van de herstelde gebruiker';
 $string['privacy:metadata:tool_usersuspension:timecreated'] = 'Tijdstip waarop de gegevens zijn aangemaakt.';
+$string['privacy:metadata:tool_usersuspension_excl'] = 'De usersuspension uitzonderingen slaan gegevens op over gebruikers die uitgesloten zijn van automatische schorsing';
+$string['privacy:metadata:tool_usersuspension_status'] = 'De usersuspension status slaat gegevens op over de schorsingsstatus van gebruikers';
+$string['privacy:metadata:tool_usersuspension_log'] = 'De usersuspension log slaat historische/log gegevens op over de schorsingsstatus van gebruikers';

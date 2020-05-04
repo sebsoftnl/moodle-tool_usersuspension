@@ -215,3 +215,6 @@ $string['privacy:metadata:tool_usersuspension:status'] = 'Suspensionstatus';
 $string['privacy:metadata:tool_usersuspension:mailsent'] = 'Whether or not an email has been sent';
 $string['privacy:metadata:tool_usersuspension:mailedto'] = 'E-mail address of the restored user';
 $string['privacy:metadata:tool_usersuspension:timecreated'] = 'Time the record was created.';
+$string['privacy:metadata:tool_usersuspension_excl'] = 'The usersuspension exclusions store users excluded from automated suspension';
+$string['privacy:metadata:tool_usersuspension_status'] = 'The usersuspension status stores information about suspended users';
+$string['privacy:metadata:tool_usersuspension_log'] = 'The usersuspension status stores historical/log information about suspended users';
