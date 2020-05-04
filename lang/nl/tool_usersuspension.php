@@ -208,3 +208,10 @@ $string['thead:mailedto'] = 'E-mail veronden naar';
 $string['thead:username'] = 'Gebruikersnaam';
 $string['thead:lastlogin'] = 'Laatste login';
 $string['thead:timemodified'] = 'Gewijzigd';
+
+$string['privacy:metadata:tool_usersuspension:type'] = 'Suspension exclusion type (always \'user\').';
+$string['privacy:metadata:tool_usersuspension:userid'] = 'De primaire database sleutel van de Moodle gebruiker voor wie herstel is gedaan.';
+$string['privacy:metadata:tool_usersuspension:status'] = 'Schorsingsstatus';
+$string['privacy:metadata:tool_usersuspension:mailsent'] = 'Of een email is verzonden naar de gebruiker';
+$string['privacy:metadata:tool_usersuspension:mailedto'] = 'E-mailadres van de herstelde gebruiker';
+$string['privacy:metadata:tool_usersuspension:timecreated'] = 'Tijdstip waarop de gegevens zijn aangemaakt.';

@@ -208,3 +208,10 @@ $string['thead:mailedto'] = 'E-mailed to';
 $string['thead:username'] = 'Username';
 $string['thead:lastlogin'] = 'Last login';
 $string['thead:timemodified'] = 'Time modified';
+
+$string['privacy:metadata:tool_usersuspension:type'] = 'Schorsings exclusion type (altijd \'user\').';
+$string['privacy:metadata:tool_usersuspension:userid'] = 'The primary key of the Moodle user for which account has been restored.';
+$string['privacy:metadata:tool_usersuspension:status'] = 'Suspensionstatus';
+$string['privacy:metadata:tool_usersuspension:mailsent'] = 'Whether or not an email has been sent';
+$string['privacy:metadata:tool_usersuspension:mailedto'] = 'E-mail address of the restored user';
+$string['privacy:metadata:tool_usersuspension:timecreated'] = 'Time the record was created.';
