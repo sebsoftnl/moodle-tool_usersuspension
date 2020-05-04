@@ -216,11 +216,19 @@ class statustable extends \table_sql {
         global $DB;
         $this->define_columns(array('username', 'name', 'timedetect', 'suspendin', 'action'));
         $this->define_headers(array('username', 'name', 'timedetect', 'suspendin', 'action'));
+
+        $suspendinsql = '('.config::get('smartdetect_suspendafter') .
+                ' - (UNIX_TIMESTAMP() - GREATEST(u.firstaccess, u.lastaccess, u.timemodified))) AS suspendin2,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
-                ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,NULL AS timedetect,' .
-                'u.suspended,u.deleted,NULL AS suspendin,NULL as action';
+                ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,' .
+                'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
+                'NULL AS suspendin,'.
+                $suspendinsql.
+                'NULL as action';
+
         list($where, $params) = util::get_suspension_query(false);
-        parent::set_sql($fields, '{user} u', $where, $params);
+        list($where2, $params2) = util::get_suspension_query(true);
+        parent::set_sql($fields, '{user} u', "({$where}) OR ({$where2})", array_merge($params, $params2));
         $this->out($pagesize, $useinitialsbar);
     }
 
@@ -235,11 +243,18 @@ class statustable extends \table_sql {
         global $DB;
         $this->define_columns(array('username', 'name', 'timedetect', 'deletein', 'action'));
         $this->define_headers(array('username', 'name', 'timedetect', 'deletein', 'action'));
+
+        $deleteinsql = '('.config::get('cleanup_deleteafter') .
+                ' - (UNIX_TIMESTAMP() - u.timemodified)) AS deletein,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
-                ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,NULL AS timedetect,' .
-                'u.suspended,u.deleted,NULL AS deletein,NULL as action';
+                ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,'.
+                'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
+                $deleteinsql.
+                'NULL as action';
+
         list($where, $params) = util::get_deletion_query(false);
-        parent::set_sql($fields, '{user} u', $where, $params);
+        list($where2, $params2) = util::get_deletion_query(true);
+        parent::set_sql($fields, '{user} u', "({$where}) OR ({$where2})", array_merge($params, $params2));
         $this->out($pagesize, $useinitialsbar);
     }
 
@@ -300,7 +315,7 @@ class statustable extends \table_sql {
         $detecttime = max($row->firstaccess, $row->lastaccess, $row->timemodified);
         $diff = time() - $detecttime;
         $time = config::get('smartdetect_suspendafter') - $diff;
-        return util::format_timespan($time);
+        return util::format_timespan($time) . '<br/>'.util::format_timespan($row->suspendin2);
     }
 
     /**
@@ -312,7 +327,7 @@ class statustable extends \table_sql {
     public function col_deletein($row) {
         $diff = time() - $row->timemodified;
         $time = config::get('cleanup_deleteafter') - $diff;
-        return util::format_timespan($time);
+        return util::format_timespan($time). '<br/>'.util::format_timespan($row->deletein);
     }
 
     /**
@@ -322,8 +337,7 @@ class statustable extends \table_sql {
      * @return string actions
      */
     public function col_timedetect($row) {
-        $detecttime = max($row->firstaccess, $row->lastaccess, $row->timemodified);
-        return userdate($detecttime);
+        return userdate($row->timedetect);
     }
 
     /**

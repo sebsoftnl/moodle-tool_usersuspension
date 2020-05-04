@@ -53,17 +53,18 @@ class util {
      * @return string
      */
     final public static function format_timespan($size) {
-        $size = (float) $size;
+        $neg = ($size < 0);
+        $size = (float) abs($size);
         if ($size > 7 * 86400) {
-            return sprintf('%d %s', floor($size / (7 * 86400)), get_string('weeks'));
+            return ($neg ? '-' : '') . sprintf('%d %s', floor($size / (7 * 86400)), get_string('weeks'));
         } else if ($size > 86400) {
-            return sprintf('%d %s', floor($size / 86400), get_string('days'));
+            return ($neg ? '-' : '') . sprintf('%d %s', floor($size / 86400), get_string('days'));
         } else if ($size > 3600) {
-            return sprintf('%d %s', floor($size / 3600), get_string('hours'));
+            return ($neg ? '-' : '') . sprintf('%d %s', floor($size / 3600), get_string('hours'));
         } else if ($size > 60) {
-            return sprintf('%d %s', floor($size / 60), get_string('minutes'));
+            return ($neg ? '-' : '') . sprintf('%d %s', floor($size / 60), get_string('minutes'));
         } else {
-            return sprintf('%d %s', $size, get_string('seconds'));
+            return ($neg ? '-' : '') . sprintf('%d %s', $size, get_string('seconds'));
         }
     }
 
@@ -103,8 +104,11 @@ class util {
      */
     public static function count_users_to_suspend() {
         global $DB;
-        list($where, $params) = self::get_suspension_query(false);
-        return $DB->count_records_sql('SELECT COUNT(*) FROM {user} u WHERE ' . $where, $params);
+        list($where, $params) = util::get_suspension_query(false);
+        list($where2, $params2) = util::get_suspension_query(true);
+        $sql = 'SELECT COUNT(*) FROM {user} u WHERE ' . "({$where}) OR ({$where2})";
+        return $DB->count_records_sql($sql, array_merge($params, $params2));
+
     }
 
     /**
@@ -115,8 +119,10 @@ class util {
      */
     public static function count_users_to_delete() {
         global $DB;
-        list($where, $params) = self::get_deletion_query(false);
-        return $DB->count_records_sql('SELECT COUNT(*) FROM {user} u WHERE ' . $where, $params);
+        list($where, $params) = util::get_deletion_query(false);
+        list($where2, $params2) = util::get_deletion_query(true);
+        $sql = 'SELECT COUNT(*) FROM {user} u WHERE ' . "({$where}) OR ({$where2})";
+        return $DB->count_records_sql($sql, array_merge($params, $params2));
     }
 
     /**

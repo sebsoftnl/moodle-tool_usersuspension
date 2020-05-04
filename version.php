@@ -29,10 +29,10 @@
 defined('MOODLE_INTERNAL') || die;
 
 $plugin = new stdClass();
-$plugin->version   = 2018050301;
+$plugin->version   = 2018050302;
 $plugin->requires  = 2018050200;      // YYYYMMDDHH (This is the release version for Moodle 3.5).
 $plugin->cron      = 0;
 $plugin->component = 'tool_usersuspension'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.5.1 (build 2018050301)';
+$plugin->release   = '3.5.2 (build 2018050302)';
 $plugin->dependencies = array();

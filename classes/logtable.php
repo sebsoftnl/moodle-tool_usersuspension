@@ -120,7 +120,7 @@ class logtable extends \table_sql {
         $table = ($this->showhistory ? 'tool_usersuspension_log' : 'tool_usersuspension_status');
         $from = '{' . $table . '} l LEFT JOIN {user} u ON l.userid=u.id';
         $where = '1 = 1';
-        $params = null;
+        $params = []; // Moodle3.8: _must_ be array now?
         parent::set_sql($fields, $from, $where, $params);
         $this->out($pagesize, $useinitialsbar);
     }
