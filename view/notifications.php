@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for tool usersuspension
+ * Processor file for user exclusion overview and configuration
  *
- * File         version.php
+ * File         notifications.php
  * Encoding     UTF-8
  *
  * @package     tool_usersuspension
@@ -25,14 +25,24 @@
  * @copyright   Sebsoft.nl
  * @author      R.J. van Dongen <rogier@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
-defined('MOODLE_INTERNAL') || die;
+ */
 
-$plugin = new stdClass();
-$plugin->version   = 2018050304;
-$plugin->requires  = 2018050200;      // YYYYMMDDHH (This is the release version for Moodle 3.5).
-$plugin->cron      = 0;
-$plugin->component = 'tool_usersuspension'; // Full name of the plugin (used for diagnostics).
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.5.4 (build 2018050304)';
-$plugin->dependencies = array();
+require_once(dirname(__FILE__) . '/../../../../config.php');
+require_once($CFG->libdir.'/adminlib.php');
+
+admin_externalpage_setup('toolusersuspension');
+$context       = \context_system::instance();
+
+$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/notifications.php', array());
+
+require_capability('tool/usersuspension:administration', $context);
+
+echo $OUTPUT->header();
+echo '<div class="tool-usersuspension-container">';
+echo '<div>';
+\tool_usersuspension\util::print_view_tabs(array(), 'notifications');
+echo '</div>';
+echo '<div>' . get_string('page:view:notifications.php:introduction', 'tool_usersuspension') . '</div>';
+echo \tool_usersuspension\util::generate_notifications();
+echo '</div>';
+echo $OUTPUT->footer();

@@ -218,11 +218,10 @@ class statustable extends \table_sql {
         $this->define_headers(array('username', 'name', 'timedetect', 'suspendin', 'action'));
 
         $suspendinsql = '('.config::get('smartdetect_suspendafter') .
-                ' - (UNIX_TIMESTAMP() - GREATEST(u.firstaccess, u.lastaccess, u.timemodified))) AS suspendin2,';
+                ' - (UNIX_TIMESTAMP() - GREATEST(u.firstaccess, u.lastaccess, u.timemodified))) AS suspendin,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,' .
                 'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
-                'NULL AS suspendin,'.
                 $suspendinsql.
                 'NULL as action';
 
@@ -312,10 +311,7 @@ class statustable extends \table_sql {
      * @return string actions
      */
     public function col_suspendin($row) {
-        $detecttime = max($row->firstaccess, $row->lastaccess, $row->timemodified);
-        $diff = time() - $detecttime;
-        $time = config::get('smartdetect_suspendafter') - $diff;
-        return util::format_timespan($time) . '<br/>'.util::format_timespan($row->suspendin2);
+        return util::format_timespan($row->suspendin);
     }
 
     /**

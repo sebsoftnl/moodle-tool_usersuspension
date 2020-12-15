@@ -36,6 +36,7 @@ $context       = \context_system::instance();
 $viewtype = optional_param('type', \tool_usersuspension\statustable::STATUS, PARAM_ALPHA);
 $thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/statuslist.php', array('type' => $viewtype));
 require_capability('tool/usersuspension:viewstatus', $context);
+
 // Process action?
 $action = optional_param('action', null, PARAM_ALPHA);
 if ($action === 'exclude') {

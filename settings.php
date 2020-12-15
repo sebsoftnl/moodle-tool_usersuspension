@@ -72,6 +72,10 @@ if ($hassiteconfig) {
             get_string('setting:enablefromfolder', 'tool_usersuspension'),
             get_string('setting:desc:enablefromfolder', 'tool_usersuspension'),
             '0', '1', '0'));
+    $temp->add(new admin_setting_configcheckbox('tool_usersuspension/enableunsuspendfromfolder',
+            get_string('setting:enableunsuspendfromfolder', 'tool_usersuspension'),
+            get_string('setting:desc:enableunsuspendfromfolder', 'tool_usersuspension'),
+            '0', '1', '0'));
     // Upload folder.
     $temp->add(new admin_setting_configdirectory('tool_usersuspension/uploadfolder',
             get_string('setting:uploadfolder', 'tool_usersuspension'),
@@ -82,10 +86,34 @@ if ($hassiteconfig) {
             get_string('setting:uploadfilename', 'tool_usersuspension'),
             get_string('setting:desc:uploadfilename', 'tool_usersuspension'),
             ''));
+    $temp->add(new admin_setting_configtext('tool_usersuspension/unsuspenduploadfilename',
+            get_string('setting:unsuspenduploadfilename', 'tool_usersuspension'),
+            get_string('setting:desc:unsuspenduploadfilename', 'tool_usersuspension'),
+            ''));
     $temp->add(new admin_setting_configduration('tool_usersuspension/uploaddetect_interval',
             get_string('setting:uploaddetect_interval', 'tool_usersuspension'),
             get_string('setting:desc:uploaddetect_interval', 'tool_usersuspension'),
             3600, 3600));
+
+    require_once($CFG->libdir . '/csvlib.class.php');
+    $choices = csv_import_reader::get_delimiter_list();
+    if (array_key_exists('cfg', $choices)) {
+        $default = 'cfg';
+    } else if (get_string('listsep', 'langconfig') == ';') {
+        $default = 'semicolon';
+    } else {
+        $default = 'comma';
+    }
+    $temp->add(new admin_setting_configselect('tool_usersuspension/csvdelimiter',
+            get_string('csvdelimiter', 'tool_usersuspension'),
+            '', ';', $choices));
+
+    // Example CSV.
+    $urldownloadcsv = new \moodle_url($CFG->wwwroot . '/admin/tool/usersuspension/assets/example.csv');
+    $temp->add(new admin_setting_description('tool_usersuspension/csvdelimiter',
+            get_string('download-sample-csv', 'tool_usersuspension'),
+            '<a href="' . $urldownloadcsv . '" target="_blank">' .
+            get_string('download-sample-csv', 'tool_usersuspension') . '</a>'));
 
     // Upload settings.
     $temp->add(new admin_setting_heading('tool_usersuspension_suspensionsettingsupload',

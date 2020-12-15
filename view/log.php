@@ -37,6 +37,7 @@ $history = optional_param('history', 0, PARAM_INT);
 $thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/log.php', array('history' => $history));
 
 require_capability('tool/usersuspension:viewstatus', $context);
+
 echo $OUTPUT->header();
 echo '<div class="tool-usersuspension-container">';
 $selected = (((int)$history === 0)) ? 'log_latest' : 'log_all';

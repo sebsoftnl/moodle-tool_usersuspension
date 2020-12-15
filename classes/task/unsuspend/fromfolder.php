@@ -23,7 +23,7 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_usersuspension\task\suspend;
+namespace tool_usersuspension\task\unsuspend;
 
 defined('MOODLE_INTERNAL') || die;
 use tool_usersuspension\config;
@@ -48,7 +48,7 @@ class fromfolder extends \core\task\scheduled_task {
      * @return string task name
      */
     public function get_name() {
-        return get_string('task:fromfolder', 'tool_usersuspension');
+        return get_string('task:unsuspendfromfolder', 'tool_usersuspension');
     }
 
     /**
@@ -61,11 +61,11 @@ class fromfolder extends \core\task\scheduled_task {
             mtrace(get_string('config:tool:disabled', 'tool_usersuspension'));
             return;
         }
-        if (!(bool)config::get('enablefromfolder')) {
-            mtrace(get_string('config:fromfolder:disabled', 'tool_usersuspension'));
+        if (!(bool)config::get('enableunsuspendfromfolder')) {
+            mtrace(get_string('config:unsuspendfromfolder:disabled', 'tool_usersuspension'));
             return;
         }
-        $uploadedfile = config::get('uploadfolder') . '/' . config::get('uploadfilename');
+        $uploadedfile = config::get('uploadfolder') . '/' . config::get('unsuspenduploadfilename');
         if (!file_exists($uploadedfile) || is_dir($uploadedfile)) {
             mtrace('CSV File "'.$uploadedfile.'" does not exist: break');
             return;
@@ -84,7 +84,7 @@ class fromfolder extends \core\task\scheduled_task {
         $proc->set_delimiter($choices[config::get('csvdelimiter')]);
         $proc->set_enclosure('"');
         $proc->set_notifycallback('mtrace');
-        $proc->set_mode(csvprocessor::MODE_SUSPEND);
+        $proc->set_mode(csvprocessor::MODE_UNSUSPEND);
         $proc->process();
         // Delete uploaded file.
         if (is_writable($uploadedfile)) {

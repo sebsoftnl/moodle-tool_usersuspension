@@ -36,6 +36,7 @@ $context       = \context_system::instance();
 $thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php', array());
 
 require_capability('tool/usersuspension:administration', $context);
+
 // Process exclusion?
 $action = optional_param('action', null, PARAM_ALPHA);
 if ($action === 'delete') {

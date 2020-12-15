@@ -49,6 +49,15 @@ $tasks = array(
         'month'     => '*'
     ),
     array(
+        'classname' => 'tool_usersuspension\task\unsuspend\fromfolder',
+        'blocking'  => 0,
+        'minute'    => '*/30',
+        'hour'      => '*',
+        'day'       => '*',
+        'dayofweek' => '*',
+        'month'     => '*'
+    ),
+    array(
         'classname' => 'tool_usersuspension\task\suspend\deleteusers',
         'blocking'  => 0,
         'minute'    => '*/5',

@@ -44,19 +44,38 @@ class upload extends \moodleform {
      * form definition
      */
     public function definition() {
+        global $CFG;
+
         $mform = $this->_form;
-        $mform->addElement('static', 'uploadfiledesc', '', get_string('form:static:uploadfile:desc', 'tool_usersuspension'));
+
+        // Example CSV.
+        $urldownloadcsv = new \moodle_url($CFG->wwwroot . '/admin/tool/usersuspension/assets/example.csv');
+        $link = '<a href="' . $urldownloadcsv
+                . '" target="_blank">' . get_string('download-sample-csv', 'tool_usersuspension') . '</a>';
+
+        $mform->addElement('static', 'uploadfiledesc', '',
+                get_string('form:static:uploadfile:desc', 'tool_usersuspension') . $link);
         $maxbytes = 1048576; // 1 MB.
         $mform->addElement('filepicker', 'userfile', get_string('file'), null,
                 array('maxbytes' => $maxbytes, 'accepted_types' => array('.csv')));
+
         $delims = array(';' => ';', '|' => '|', ',' => ',');
         $select1 = $mform->addElement('select', 'delimiter', get_string('csv:delimiter', 'tool_usersuspension'), $delims);
         $mform->setType('delimiter', PARAM_TEXT);
         $select1->setSelected(';');
+
         $enclosures = array('"' => '"', "'" => "'");
         $select2 = $mform->addElement('select', 'enclosure', get_string('csv:enclosure', 'tool_usersuspension'), $enclosures);
         $mform->setType('enclosure', PARAM_TEXT);
         $select2->setSelected('"');
+
+        $options = array(
+            \tool_usersuspension\processor\csv::MODE_SUSPEND => get_string('suspend', 'tool_usersuspension'),
+            \tool_usersuspension\processor\csv::MODE_UNSUSPEND => get_string('unsuspend', 'tool_usersuspension'),
+        );
+        $mform->addElement('select', 'suspendmode', get_string('suspendmode', 'tool_usersuspension'), $options);
+        $mform->setType('suspendmode', PARAM_INT);
+        $mform->setDefault('suspendmode', \tool_usersuspension\processor\csv::MODE_SUSPEND);
 
         $this->add_action_buttons(true, get_string('csv:upload:continue', 'tool_usersuspension'));
     }
@@ -91,6 +110,7 @@ class upload extends \moodleform {
         $proc->set_delimiter($data->delimiter);
         $proc->set_enclosure($data->enclosure);
         $proc->set_notifycallback('mtrace');
+        $proc->set_mode($data->suspendmode);
         echo "<pre>";
         $proc->process();
         echo "</pre>";

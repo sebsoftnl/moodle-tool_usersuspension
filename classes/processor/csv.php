@@ -39,6 +39,15 @@ defined('MOODLE_INTERNAL') || die;
 class csv {
 
     /**
+     * @var int SUSPEND MODE
+     */
+    const MODE_SUSPEND = 1;
+    /**
+     * @var int UNSUSPEND MODE
+     */
+    const MODE_UNSUSPEND = 2;
+
+    /**
      * CSV Filename
      * @var string
      */
@@ -75,6 +84,16 @@ class csv {
      * @var array list of userids
      */
     protected $exclusionlist;
+    /**
+     * Set test run.
+     * @var bool
+     */
+    protected $testmode = false;
+    /**
+     * Set run mode.
+     * @var bool
+     */
+    protected $mode = 1;
 
     /**
      * Return CSV filename
@@ -171,6 +190,43 @@ class csv {
     }
 
     /**
+     * Do we suspend at all (have a test run)?
+     * @return bool
+     */
+    public function get_testmode() {
+        return $this->testmode;
+    }
+
+    /**
+     * Set no-suspend mode (test mode)
+     *
+     * @param bool $testmode
+     * @return $this
+     */
+    public function set_testmode($testmode = true) {
+        $this->testmode = $testmode;
+        return $this;
+    }
+
+    /**
+     * Get run mode
+     * @return int
+     */
+    public function get_mode() {
+        return $this->mode;
+    }
+
+    /**
+     * Get run mode
+     * @param int $mode
+     * @return $this
+     */
+    public function set_mode($mode) {
+        $this->mode = $mode;
+        return $this;
+    }
+
+    /**
      * Create a new instance of a CSV processor
      */
     public function __construct() {
@@ -231,15 +287,27 @@ class csv {
         switch ($type) {
             case 'email':
                 $email = clean_param(trim($line[1]), PARAM_EMAIL);
-                $rs = $this->_suspend_user(array('email' => $email));
+                if ($this->mode == static::MODE_SUSPEND) {
+                    $rs = $this->_suspend_user(array('email' => $email));
+                } else {
+                    $rs = $this->_unsuspend_user(array('email' => $email));
+                }
                 break;
             case 'idnumber':
                 $idnumber = clean_param(trim($line[1]), PARAM_NOTAGS);
-                $rs = $this->_suspend_user(array('idnumber' => $idnumber));
+                if ($this->mode == static::MODE_SUSPEND) {
+                    $rs = $this->_suspend_user(array('idnumber' => $idnumber));
+                } else {
+                    $rs = $this->_unsuspend_user(array('idnumber' => $idnumber));
+                }
                 break;
             case 'username':
                 $username = clean_param(trim($line[1]), PARAM_USERNAME);
-                $rs = $this->_suspend_user(array('username' => $username));
+                if ($this->mode == static::MODE_SUSPEND) {
+                    $rs = $this->_suspend_user(array('username' => $username));
+                } else {
+                    $rs = $this->_unsuspend_user(array('username' => $username));
+                }
                 break;
             default:
                 $this->notify(get_string('notify:unknown-suspend-type', 'tool_usersuspension', $type));
@@ -270,6 +338,11 @@ class csv {
             }
             $this->notify(get_string('notify:suspend-user', 'tool_usersuspension', $user));
             // Suspend this user.
+            if ($this->testmode) {
+                $result = true;
+                $this->notify(get_string('msg:user:suspend:testmodemode', 'tool_usersuspension', $user));
+                return $result;
+            }
             $result = \tool_usersuspension\util::do_suspend_user($user);
             if ($result === true) {
                 $this->notify(get_string('msg:user:suspend:success', 'tool_usersuspension', $user));
@@ -281,4 +354,44 @@ class csv {
         $this->notify("\t" . get_string('msg:user:not-found', 'tool_usersuspension'));
         return false;
     }
+
+    /**
+     * Performs the user suspension.
+     * The user, when found, is checked against the exclusion list to determine
+     * if he/she shouldn't be suspended.
+     *
+     * @param array $params general parameters to use in the query to lookup a record from the database
+     * @return bool true if successfully suspended, false otherwise
+     */
+    protected function _unsuspend_user($params) {
+        global $CFG, $DB;
+        $this->notify(__METHOD__ . ": " . key($params) . ' = ' . current($params));
+        $params['mnethostid'] = $CFG->mnet_localhost_id;
+        $params['deleted'] = 0;
+        $params['suspended'] = 1;
+        $user = $DB->get_record('user', $params);
+        if (!empty($user)) {
+            if (in_array($user->id, $this->exclusionlist)) {
+                $this->notify(get_string('notify:suspend-excluded-user', 'tool_usersuspension', $user));
+                return;
+            }
+            $this->notify(get_string('notify:suspend-user', 'tool_usersuspension', $user));
+            // Suspend this user.
+            if ($this->testmode) {
+                $result = true;
+                $this->notify(get_string('msg:user:suspend:testmodemode', 'tool_usersuspension', $user));
+                return $result;
+            }
+            $result = \tool_usersuspension\util::do_unsuspend_user($user);
+            if ($result === true) {
+                $this->notify(get_string('msg:user:unsuspend:success', 'tool_usersuspension', $user));
+            } else {
+                $this->notify(get_string('msg:user:unsuspend:failed', 'tool_usersuspension', $user));
+            }
+            return $result;
+        }
+        $this->notify("\t" . get_string('msg:user:not-found', 'tool_usersuspension'));
+        return false;
+    }
+
 }
