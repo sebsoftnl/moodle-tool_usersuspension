@@ -1,3 +1,8 @@
+Version 3.5.6 (build 2020121501)
+* Added tab and script to test configuration of unattended suspension/unsuspension ("from folder" option).
+
+----------
+
 Version 3.5.5 (build 2020121500)
 * Replaced "self::" with "static::" in \tool_usersuspension\util.
 * Fixed wrong language string.

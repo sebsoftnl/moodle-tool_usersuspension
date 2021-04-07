@@ -687,6 +687,13 @@ class util {
                     get_string('link:upload', 'tool_usersuspension'));
             $tabs[] = $upload;
         }
+
+        // Add tests.
+        $testfromfolder = static::pictabobject('testfromfolder', 'testfromfolder', 'tool_usersuspension',
+            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/testfromfolder.php', $params),
+                get_string('testfromfolder', 'tool_usersuspension'));
+        $tabs[] = $testfromfolder;
+
         // Add logs tabs.
         $logs = static::pictabobject('logs', 'logs', 'tool_usersuspension',
             new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/log.php', $params + array('history' => 0)),
