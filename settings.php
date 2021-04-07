@@ -106,11 +106,11 @@ if ($hassiteconfig) {
     }
     $temp->add(new admin_setting_configselect('tool_usersuspension/csvdelimiter',
             get_string('csvdelimiter', 'tool_usersuspension'),
-            '', ';', $choices));
+            '', $default, $choices));
 
     // Example CSV.
     $urldownloadcsv = new \moodle_url($CFG->wwwroot . '/admin/tool/usersuspension/assets/example.csv');
-    $temp->add(new admin_setting_description('tool_usersuspension/csvdelimiter',
+    $temp->add(new admin_setting_description('tool_usersuspension/csvexample',
             get_string('download-sample-csv', 'tool_usersuspension'),
             '<a href="' . $urldownloadcsv . '" target="_blank">' .
             get_string('download-sample-csv', 'tool_usersuspension') . '</a>'));
