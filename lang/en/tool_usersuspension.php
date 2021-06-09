@@ -75,6 +75,10 @@ $string['setting:smartdetect_interval'] = 'Smart detect interval';
 $string['setting:desc:smartdetect_interval'] = 'Sets interval at which smart detection runs';
 $string['setting:smartdetect_suspendafter'] = 'Inactivity suspension interval';
 $string['setting:desc:smartdetect_suspendafter'] = 'Sets interval at which users are suspended when inactive';
+$string['setting:enablesmartdetectwarning'] = 'Send warning e-mails about impending suspension?';
+$string['setting:desc:enablesmartdetectwarning'] = 'When enabled, this will send out e-mails to users their impending suspension.';
+$string['setting:smartdetect_warninginterval'] = 'Warning period';
+$string['setting:desc:smartdetect_warninginterval'] = 'Sets the time before suspension that a user receives a warning message about the impending suspension.';
 $string['suspensionsettingscleanup'] = 'Cleanup';
 $string['suspensionsettingscleanupdesc'] = 'Configure the cleanup settings below.<br/>
 The cleanup process is here to further automate cleaning up users, meaning suspended user accounts will get deleted
@@ -114,6 +118,7 @@ $string['config:tool:disabled'] = 'User Suspension Utility is disabled in global
 $string['config:smartdetect:disabled'] = 'User Suspension option \'smart detection\' is disabled in global tool configuration';
 $string['config:fromfolder:disabled'] = 'User Suspension option \'suspend from upload\' is disabled in global tool configuration';
 $string['config:cleanup:disabled'] = 'User Suspension option \'cleanup\' is disabled in global tool configuration';
+$string['configoption:notactive'] = 'Despite the overview below, the settings dictate the actual process is <i>not</i> enforced.';
 $string['err:statustable:set_sql'] = 'set_sql() is disabled. This table defines it\'s own and is not customomizable';
 $string['notify:load-exclude-list'] = 'Loading user exclusion list';
 $string['notify:load-file'] = 'Opening file \'{$a}\'';
@@ -158,6 +163,12 @@ please contact {$a->contact}</p>
 $string['email:user:delete:subject'] = 'Your account has been removed';
 $string['email:user:delete:body'] = '<p>Dear {$a->name}</p>
 <p>You account has been removed after having been suspended for {$a->timesuspended}</p>
+<p>Regards<br/>{$a->signature}</p>';
+$string['email:user:warning:subject'] = 'Your account will soon be suspended';
+$string['email:user:warning:body'] = '<p>Dear {$a->name}</p>
+<p>Your account will be suspended in {$a->warningperiod} due to inactivity on the platform.</p>
+<p>You must login within the next {$a->warningperiod} to keep your account active.
+To prevent this from occuring please enrue you log intop the system at least every {$a->suspendinterval}.</p>
 <p>Regards<br/>{$a->signature}</p>';
 $string['form:static:uploadfile:desc'] = 'Upload your user suspension file here<br/>
 The uploaded CSV file can be configured as follows:<br/>
@@ -210,6 +221,11 @@ $string['thead:mailedto'] = 'E-mailed to';
 $string['thead:username'] = 'Username';
 $string['thead:lastlogin'] = 'Last login';
 $string['thead:timemodified'] = 'Time modified';
+$string['thead:deletein'] = 'Delete in';
+$string['thead:suspendin'] = 'Suspend in';
+$string['thead:timedetect'] = 'Detection based on';
+$string['deleteon'] = 'Delete on';
+$string['suspendon'] = 'Suspend on';
 
 $string['privacy:metadata:tool_usersuspension:type'] = 'Schorsings exclusion type (altijd \'user\').';
 $string['privacy:metadata:tool_usersuspension:userid'] = 'The primary key of the Moodle user for which account has been restored.';
@@ -249,3 +265,7 @@ $string['config:uploadfile:exists'] = 'Upload file "{$a}" exists';
 $string['msg:file-would-delete'] = 'Uploaded file would now be deleted (if this weren\'t a configuration validation)';
 $string['testing:suspendfromfolder'] = 'Testing configuration for "suspend from folder"';
 $string['testing:unsuspendfromfolder'] = 'Testing configuration for "unsuspend from folder"';
+
+// Access strings.
+$string['usersuspension:administration'] = 'User suspension administration';
+$string['usersuspension:viewstatus'] = 'View user suspension status';

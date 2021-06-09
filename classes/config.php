@@ -42,18 +42,18 @@ class config {
      *
      * @var whether or not config has been loaded yet
      */
-    static private $loaded = false;
+    private static $loaded = false;
 
     /**
      *
      * @var \stdClass the tool configuration
      */
-    static private $config = null;
+    private static $config = null;
 
     /**
      * initialize the tool configuration
      */
-    static private function init() {
+    private static function init() {
         if (!self::$loaded) {
             self::$config = get_config('tool_usersuspension');
         }

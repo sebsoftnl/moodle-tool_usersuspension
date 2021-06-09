@@ -263,7 +263,7 @@ class csv {
             $line = fgetcsv($this->fh, 0, $this->delimiter, $this->enclosure, $this->escape);
             if ($line !== null && $line !== false) {
                 if ($line[0] != 'type') {
-                    $this->_process_line($line);
+                    $this->p_process_line($line);
                 }
             }
         }
@@ -276,7 +276,7 @@ class csv {
      * @param array $line array representing the read CSV line
      * @return bool true if successfully processed, false otherwise
      */
-    protected function _process_line($line) {
+    protected function p_process_line($line) {
         if (count($line) === 1) {
             // Assumes email.
             $line = array('email', $line[0]);
@@ -288,25 +288,25 @@ class csv {
             case 'email':
                 $email = clean_param(trim($line[1]), PARAM_EMAIL);
                 if ($this->mode == static::MODE_SUSPEND) {
-                    $rs = $this->_suspend_user(array('email' => $email));
+                    $rs = $this->p_suspend_user(array('email' => $email));
                 } else {
-                    $rs = $this->_unsuspend_user(array('email' => $email));
+                    $rs = $this->p_unsuspend_user(array('email' => $email));
                 }
                 break;
             case 'idnumber':
                 $idnumber = clean_param(trim($line[1]), PARAM_NOTAGS);
                 if ($this->mode == static::MODE_SUSPEND) {
-                    $rs = $this->_suspend_user(array('idnumber' => $idnumber));
+                    $rs = $this->p_suspend_user(array('idnumber' => $idnumber));
                 } else {
-                    $rs = $this->_unsuspend_user(array('idnumber' => $idnumber));
+                    $rs = $this->p_unsuspend_user(array('idnumber' => $idnumber));
                 }
                 break;
             case 'username':
                 $username = clean_param(trim($line[1]), PARAM_USERNAME);
                 if ($this->mode == static::MODE_SUSPEND) {
-                    $rs = $this->_suspend_user(array('username' => $username));
+                    $rs = $this->p_suspend_user(array('username' => $username));
                 } else {
-                    $rs = $this->_unsuspend_user(array('username' => $username));
+                    $rs = $this->p_unsuspend_user(array('username' => $username));
                 }
                 break;
             default:
@@ -324,7 +324,7 @@ class csv {
      * @param array $params general parameters to use in the query to lookup a record from the database
      * @return bool true if successfully suspended, false otherwise
      */
-    protected function _suspend_user($params) {
+    protected function p_suspend_user($params) {
         global $CFG, $DB;
         $this->notify(__METHOD__ . ": " . key($params) . ' = ' . current($params));
         $params['mnethostid'] = $CFG->mnet_localhost_id;
@@ -363,7 +363,7 @@ class csv {
      * @param array $params general parameters to use in the query to lookup a record from the database
      * @return bool true if successfully suspended, false otherwise
      */
-    protected function _unsuspend_user($params) {
+    protected function p_unsuspend_user($params) {
         global $CFG, $DB;
         $this->notify(__METHOD__ . ": " . key($params) . ' = ' . current($params));
         $params['mnethostid'] = $CFG->mnet_localhost_id;

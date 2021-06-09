@@ -73,8 +73,12 @@ $string['setting:enablesmartdetect'] = 'Slimme detectie inschakelen';
 $string['setting:desc:enablesmartdetect'] = 'Schakelt de slimme detectie aan of uit voor deze plugin..';
 $string['setting:smartdetect_interval'] = 'Interval voor slimme detectie';
 $string['setting:desc:smartdetect_interval'] = 'Stel interval in hoe vaak slimme detectie draait';
-$string['setting:smartdetect_suspendafter'] = 'Inactivity suspension interval';
+$string['setting:smartdetect_suspendafter'] = 'Schorsingsinterval';
 $string['setting:desc:smartdetect_suspendafter'] = 'Stel interval in waarop gebruikers als inactief worden aangemerkt en automatisch worden geschorst';
+$string['setting:enablesmartdetectwarning'] = 'E0mails verzenden tbv schorsing??';
+$string['setting:desc:enablesmartdetectwarning'] = 'Indien ingeschakeld wordt een email verstuurd naar de eindgebruiker dat het account binnenkort wordt geschorst.';
+$string['setting:smartdetect_warninginterval'] = 'Waarschuwingsperiode';
+$string['setting:desc:smartdetect_warninginterval'] = 'Zet de tijd voor schorsing voordat een eindgebruiker een email zal krijgen over de op hand zijnde schorsing van diens account.';
 $string['suspensionsettingscleanup'] = 'Opschonen';
 $string['suspensionsettingscleanupdesc'] = 'Configureer opschoningsinstellingen.<br/>
 Het opschoningsproces dient ter verdere automatische opschoning van gebruikersaccounts, en betekent dat geschorste gebruikersaccounts zullen worden verwijderd
@@ -96,7 +100,7 @@ $string['csv:upload:continue'] = 'Doorgaan';
 
 $string['page:view:statuslist.php:introduction:status'] = '<p>Dit overzicht toont de actief gemonitoorde gebruikers.<br/>
 Actief gemonitoorde gebruikers zijn gebruikers die daadwerkelijk worden gemonitoord (dit betekent dat ze niet zijn geconfigureerd om uitgesloten te zijn voor verwerking).<br/>
-Dit overzicht wijkt dus in die zin af van het standaard gebruikersbeheer overzicht dat het <i>geen</igebruikers toont die uitgesloten zijn van verwerking
+Dit overzicht wijkt dus in die zin af van het standaard gebruikersbeheer overzicht dat het <i>geen</i> gebruikers toont die uitgesloten zijn van verwerking
 door de mogelijkheden die dit blok bied om gebruikers en volledige cohorten uit te sluiten.</p>';
 $string['page:view:statuslist.php:introduction:delete'] = '<p>Dit overzicht toont de gebruikeraccounts die zullen worden verwijderd binnen
 de voor dit blok geconfigureerde periode.</p>';
@@ -114,6 +118,7 @@ $string['config:tool:disabled'] = 'Gebruikersschorsing plugin is uitgezet via de
 $string['config:smartdetect:disabled'] = 'Gebruikersschorsing optie \'slimme detectie\' is uitgezet via de globale blokinstellingen';
 $string['config:fromfolder:disabled'] = 'Gebruikersschorsing optie \'schorsen door bestandsupload\' is uitgezet via de globale blokinstellingen';
 $string['config:cleanup:disabled'] = 'Gebruikersschorsing optie \'opschoning van gebruikers\' is uitgezet via de globale blokinstellingen';
+$string['configoption:notactive'] = 'Ondanks onderstaand overzicht dicteren de instellingen dat het proces zelf <i>niet</i> wordt uitgevoerd.';
 $string['err:statustable:set_sql'] = 'set_sql() is uitgeschakeld. Deze tabel definieert zijn eigen queries';
 $string['notify:load-exclude-list'] = 'Gebruikersuitsluitingen laden';
 $string['notify:load-file'] = 'Bestand \'{$a}\' openen';
@@ -208,6 +213,11 @@ $string['thead:mailedto'] = 'E-mail veronden naar';
 $string['thead:username'] = 'Gebruikersnaam';
 $string['thead:lastlogin'] = 'Laatste login';
 $string['thead:timemodified'] = 'Gewijzigd';
+$string['thead:deletein'] = 'Verwijderen over';
+$string['thead:suspendin'] = 'Schorsen over';
+$string['thead:timedetect'] = 'Datum gebaseerd op';
+$string['deleteon'] = 'Verwijderen op';
+$string['suspendon'] = 'Schorsen op';
 
 $string['privacy:metadata:tool_usersuspension:type'] = 'Suspension exclusion type (always \'user\').';
 $string['privacy:metadata:tool_usersuspension:userid'] = 'De primaire database sleutel van de Moodle gebruiker voor wie herstel is gedaan.';
@@ -234,3 +244,16 @@ $string['setting:desc:unsuspenduploadfilename'] = 'Stel bestandsnaam in voor geb
 $string['page:view:notifications.php:introduction'] = 'Dit tabblad toont mogelijke problemen met de configuratie van deze tool.';
 $string['tab:notifications'] = 'Instellingencontrole';
 $string['notifications:allok'] = 'Je configuratie lijkt volledig op orde, er konden geen problemen worden ontdekt voor wat betreft de globale instellingen van deze tool.';
+$string['testfromfolder'] = 'Test achtergrondverwerking';
+$string['testfromfolder:suspend'] = 'Test achtergrondverwerking van het schorsen van gebruikers (vanuit folder)';
+$string['testfromfolder:unsuspend'] = 'Test achtergrondverwerking van het ontschorsen van gebruikers  (vanuit folder)';
+$string['config:tool:enabled'] = 'User Suspension tool is ingeschakeld in globale instellingen';
+$string['config:fromfolder:enabled'] = 'User Suspension optie \'schorsen vanaf geupload bestand\' is ingeschakeld in globale instellingen';
+$string['config:unsuspendfromfolder:enabled'] = 'User Suspension optie \'ontschorsen vanaf geupload bestand\' is ingeschakeld in globale instellingen';
+$string['config:uploadfolder:not-exists'] = 'Upload map "{$a}" bestaat niet';
+$string['config:uploadfolder:exists'] = 'Upload map "{$a}" exists';
+$string['config:uploadfile:not-exists'] = 'Upload bestand "{$a}" bestaat niet';
+$string['config:uploadfile:exists'] = 'Upload bestand "{$a}" bestaat';
+$string['msg:file-would-delete'] = 'Geupload bestand zou nu worden verwijderd (indien dit geen validatie/testrun van globale instellingen was)';
+$string['testing:suspendfromfolder'] = 'Ingestelde configuratie testen voor "schorsen vanaf geupload bestand"';
+$string['testing:unsuspendfromfolder'] = 'Ingestelde configuratie testen voor "ontschorsen vanaf geupload bestand"';

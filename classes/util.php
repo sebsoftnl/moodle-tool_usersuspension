@@ -47,6 +47,18 @@ class util {
     }
 
     /**
+     * Nasty function to try and assure UNIQUE prefixes.
+     * Only use this to prefix named query params.
+     *
+     * @return string
+     */
+    public static function get_prefix() {
+        static $counter = 0;
+        $counter++;
+        return 'pfx' . $counter;
+    }
+
+    /**
      * Return a more humanly readable timespan string from a timespan
      *
      * @param float $size
@@ -76,8 +88,8 @@ class util {
      */
     public static function count_monitored_users() {
         global $DB;
-        $where = 'deleted = ?';
-        $params = array(0);
+        $where = 'deleted = :deleted';
+        $params = array('deleted' => 0);
         static::append_user_exclusion($where, $params, 'u.');
         return $DB->count_records_sql('SELECT COUNT(*) FROM {user} u WHERE ' . $where, $params);
     }
@@ -90,8 +102,8 @@ class util {
      */
     public static function count_suspended_users() {
         global $DB;
-        $where = 'suspended = ? AND deleted = ?';
-        $params = array(1, 0);
+        $where = 'suspended = :suspended AND deleted = :deleted';
+        $params = array('suspended' => 1, 'deleted' => 0);
         static::append_user_exclusion($where, $params, 'u.');
         return $DB->count_records_sql('SELECT COUNT(*) FROM {user} u WHERE ' . $where, $params);
     }
@@ -107,7 +119,7 @@ class util {
         list($where, $params) = static::get_suspension_query(false);
         list($where2, $params2) = static::get_suspension_query(true);
         $sql = 'SELECT COUNT(*) FROM {user} u WHERE ' . "({$where}) OR ({$where2})";
-        return $DB->count_records_sql($sql, array_merge($params, $params2));
+        return $DB->count_records_sql($sql, $params + $params2);
 
     }
 
@@ -122,7 +134,7 @@ class util {
         list($where, $params) = static::get_deletion_query(false);
         list($where2, $params2) = static::get_deletion_query(true);
         $sql = 'SELECT COUNT(*) FROM {user} u WHERE ' . "({$where}) OR ({$where2})";
-        return $DB->count_records_sql($sql, array_merge($params, $params2));
+        return $DB->count_records_sql($sql, $params + $params2);
     }
 
     /**
@@ -130,7 +142,7 @@ class util {
      *
      * @return boolean
      */
-    static final public function mark_users_to_suspend() {
+    final public static function mark_users_to_suspend() {
         global $DB;
         if (!(bool)config::get('enabled')) {
             return false;
@@ -153,11 +165,57 @@ class util {
     }
 
     /**
+     * Warns inactive users that they will be suspended soon. This must be run *AFTER* user suspension is done,
+     * or it will email suspended users if this is the first run.
+     */
+    final public static function warn_users_of_suspension() {
+        global $DB;
+
+        if (!(bool)config::get('enabled')) {
+            return false;
+        }
+        if (!(bool)config::get('enablesmartdetect')) {
+            return false;
+        }
+        if (!(bool)config::get('enablesmartdetect_warning')) {
+            return false;
+        }
+        // Run in parallel with the suspensions.
+        $lastrun = static::get_lastrun_config('smartdetect', 0, true);
+        $deltatime = time() - $lastrun;
+        if ($deltatime < config::get('smartdetect_interval')) {
+            return false;
+        }
+
+        // Do nothing if warningtime is 0.
+        $warningtime = (int)config::get('smartdetect_warninginterval');
+        if ($warningtime <= 0) {
+            return false;
+        }
+
+        // Get the query for users to warn.
+        $warningthreshold = (time() - (int)config::get('smartdetect_suspendafter')) + $warningtime;
+        list($where, $params) = static::get_suspension_query(true, $warningthreshold);
+        $sql = "SELECT * FROM {user} u WHERE $where";
+        $users = $DB->get_records_sql($sql, $params);
+        foreach ($users as $user) {
+            // Check whether the user was already warned.
+            if ((get_user_preferences('tool_usersuspension_warned', false, $user))) {
+                continue;
+            }
+
+            static::process_user_warning_email($user);
+            // Mark the user as warned. This will be reset on their first successful login post warning.
+            set_user_preference('tool_usersuspension_warned', true, $user);
+        }
+    }
+
+    /**
      * Deletes suspended users according to configuration settings.
      *
      * @return boolean
      */
-    static final public function delete_suspended_users() {
+    final public static function delete_suspended_users() {
         global $DB;
         if (!(bool)config::get('enabled')) {
             return false;
@@ -186,7 +244,7 @@ class util {
      * @param mixed $default default value to return if this config is not set
      * @param bool $autosetnew if true, automatically insert current time for the last run configuration
      */
-    static final protected function get_lastrun_config($type, $default = null, $autosetnew = true) {
+    final protected static function get_lastrun_config($type, $default = null, $autosetnew = true) {
         $value = get_config('tool_usersuspension', $type . '_lastrun');
         if ($autosetnew) {
             static::set_lastrun_config($type);
@@ -199,7 +257,7 @@ class util {
      *
      * @param string $type
      */
-    static final protected function set_lastrun_config($type) {
+    final protected static function set_lastrun_config($type) {
         set_config(time(), $type . '_lastrun', 'tool_usersuspension');
     }
 
@@ -210,7 +268,7 @@ class util {
      * @param bool $automated true if a result of automated suspension, false if suspending
      *              is a result of a manual action
      */
-    static public final function do_suspend_user($user, $automated = true) {
+    final public static function do_suspend_user($user, $automated = true) {
         global $USER, $CFG;
         require_once($CFG->dirroot . '/user/lib.php');
         // Piece of code taken from /admin/user.php so we dance just like moodle does.
@@ -244,7 +302,7 @@ class util {
      *
      * @param \stdClass $user
      */
-    static public final function do_unsuspend_user($user) {
+    final public static function do_unsuspend_user($user) {
         global $CFG, $DB;
         require_once($CFG->dirroot . '/user/lib.php');
         // Piece of code taken from /admin/user.php so we dance just like moodle does.
@@ -279,7 +337,7 @@ class util {
      * @param \stdClass $user
      * @return bool true if successful, false otherwise
      */
-    static public final function do_delete_user($user) {
+    final public static function do_delete_user($user) {
         global $USER, $CFG;
         require_once($CFG->dirroot . '/user/lib.php');
         // Piece of code taken from /admin/user.php so we dance just like moodle does.
@@ -305,7 +363,7 @@ class util {
      * @param string $status status string
      * @param bool $emailsent whether or not the email was sent
      */
-    static public final function process_status_record($user, $status, $emailsent) {
+    final public static function process_status_record($user, $status, $emailsent) {
         global $DB;
         // Move existing record to log.
         $recordstolog = $DB->get_records('tool_usersuspension_status', array('userid' => $user->id));
@@ -333,7 +391,7 @@ class util {
      * @param array $params
      * @param string $useraliasprefix alias prefix for users (e.g. 'u.' to indicate u.id)
      */
-    static public function append_user_exclusion(&$where, &$params, $useraliasprefix = '') {
+    public static function append_user_exclusion(&$where, &$params, $useraliasprefix = '') {
         global $CFG, $DB;
         // Set standard exclusions.
         $excludeids = array(1, $CFG->siteguest); // Guest account.
@@ -342,9 +400,9 @@ class util {
         $excludeids = array_merge($excludeids, static::get_user_exclusion_list());
         $excludeids = array_unique($excludeids);
 
-        list($notinsql, $uparams) = $DB->get_in_or_equal($excludeids, SQL_PARAMS_QM, 'param', false);
+        list($notinsql, $uparams) = $DB->get_in_or_equal($excludeids, SQL_PARAMS_NAMED, 'uidexc', false, 0);
         $where .= ' AND ' . $useraliasprefix . 'id '.$notinsql;
-        $params = array_merge($params, $uparams);
+        $params = $params + $uparams;
     }
 
     /**
@@ -353,16 +411,16 @@ class util {
      *
      * @return array list of user ids
      */
-    static public function get_user_exclusion_list() {
+    public static function get_user_exclusion_list() {
         global $DB;
         // First load users.
         $userids = $DB->get_fieldset_select('tool_usersuspension_excl', 'refid',
-                'type = ?', array('user'));
+                'type = :type', array('type' => 'user'));
         $cohortids = $DB->get_fieldset_select('tool_usersuspension_excl', 'refid',
-                'type = ?', array('cohort'));
+                'type = :type', array('type' => 'cohort'));
         foreach ($cohortids as $cohortid) {
             $cohortuserids = $DB->get_fieldset_select('cohort_members', 'userid',
-                    'cohortid = ?', array($cohortid));
+                    'cohortid = :cohid', array('cohid' => $cohortid));
             $userids = array_merge($userids, $cohortuserids);
         }
 
@@ -377,20 +435,25 @@ class util {
      *          If false, this returns the query for users that are not past their
      *          date of suspension yet. The latter can be used for statistics on
      *          when users would get suspended.
+     * @param int $customtime A custom timestamp to perform the comparison against.
      * @return array A list containing the constructed where part of the sql and an array of parameters.
      */
-    public static function get_suspension_query($pastsuspensiondate = true) {
+    public static function get_suspension_query($pastsuspensiondate = true, $customtime = null) {
         global $CFG;
+        $uniqid = static::get_prefix();
         $detectoperator = $pastsuspensiondate ? '<' : '>';
-        $timecheck = time() - (config::get('smartdetect_suspendafter'));
-        $where = "u.confirmed = 1 AND u.suspended = 0 AND u.deleted = 0 AND u.mnethostid = ? ";
+        $timecheck = !empty($customtime) ? $customtime : time() - (config::get('smartdetect_suspendafter'));
+        $where = "u.confirmed = 1 AND u.suspended = 0 AND u.deleted = 0 AND u.mnethostid = :{$uniqid}mnethost ";
         $where .= "AND (";
-        $where .= "(u.lastaccess = 0 AND u.firstaccess > 0 AND u.firstaccess $detectoperator ?)";
-        $where .= " OR (u.lastaccess > 0 AND u.lastaccess $detectoperator ?)";
+        $where .= "(u.lastaccess = 0 AND u.firstaccess > 0 AND u.firstaccess $detectoperator :{$uniqid}time1)";
+        $where .= " OR (u.lastaccess > 0 AND u.lastaccess $detectoperator :{$uniqid}time2)";
         $where .= " OR (u.auth = 'manual' AND u.firstaccess = 0 AND u.lastaccess = 0 ";
-        $where .= "     AND u.timemodified > 0 AND u.timemodified $detectoperator ?)";
+        $where .= "     AND u.timemodified > 0 AND u.timemodified $detectoperator :{$uniqid}time3)";
         $where .= ")";
-        $params = array($CFG->mnet_localhost_id, $timecheck, $timecheck, $timecheck);
+        $params = array("{$uniqid}mnethost" => $CFG->mnet_localhost_id,
+            "{$uniqid}time1" => $timecheck,
+            "{$uniqid}time2" => $timecheck,
+            "{$uniqid}time3" => $timecheck);
         // Append user exclusion.
         static::append_user_exclusion($where, $params, 'u.');
         return array($where, $params);
@@ -409,10 +472,11 @@ class util {
     public static function get_deletion_query($pastdeletiondate = true) {
         global $CFG;
         $detectoperator = $pastdeletiondate ? '<' : '>';
-        $params = array($CFG->mnet_localhost_id,
-            time() - (int)config::get('cleanup_deleteafter'));
+        $uniqid = static::get_prefix();
+        $params = array("{$uniqid}mnethost" => $CFG->mnet_localhost_id,
+            "{$uniqid}" => time() - (int)config::get('cleanup_deleteafter'));
         $where = "u.suspended = 1 AND u.confirmed = 1 AND u.deleted = 0 "
-                . "AND u.mnethostid = ? AND u.timemodified $detectoperator ?";
+                . "AND u.mnethostid = :{$uniqid}mnethost AND u.timemodified $detectoperator :{$uniqid}";
         static::append_user_exclusion($where, $params, 'u.');
         return array($where, $params);
     }
@@ -520,6 +584,28 @@ class util {
     }
 
     /**
+     * Send an e-mail due to a user facing suspension due to inactivity.
+     *
+     * @param \stdClass $user
+     * @return void
+     */
+    public static function process_user_warning_email($user) {
+        // Prepare and send email.
+        $from = \core_user::get_support_user();
+        $a = new \stdClass();
+        $a->name = fullname($user);
+        $a->suspendinterval = static::format_timespan(config::get('smartdetect_suspendafter'));
+        $a->warningperiod = static::format_timespan(config::get('smartdetect_warninginterval'));
+        $a->contact = $from->email;
+        $a->signature = fullname($from);
+        $subject = get_string('email:user:warning:subject', 'tool_usersuspension', $a);
+        $messagehtml = get_string('email:user:warning:body', 'tool_usersuspension', $a);
+
+        $messagetext = format_text_email($messagehtml, FORMAT_HTML);
+        return email_to_user($user, $from, $subject, $messagetext, $messagehtml);
+    }
+
+    /**
      * Send an e-mail due to a user being unsuspended
      *
      * @param \stdClass $user
@@ -573,7 +659,7 @@ class util {
      *
      * @return boolean
      */
-    static public function clean_logs() {
+    public static function clean_logs() {
         global $DB;
         if (!(bool)config::get('enablecleanlogs')) {
             return false;
@@ -642,7 +728,7 @@ class util {
      * @param array $params basic url parameters
      * @param string $selected id of the selected tab
      */
-    static public function print_view_tabs($params, $selected) {
+    public static function print_view_tabs($params, $selected) {
         global $CFG, $OUTPUT;
         $tabs = array();
         // Add exclusions.
@@ -688,12 +774,6 @@ class util {
             $tabs[] = $upload;
         }
 
-        // Add tests.
-        $testfromfolder = static::pictabobject('testfromfolder', 'testfromfolder', 'tool_usersuspension',
-            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/testfromfolder.php', $params),
-                get_string('testfromfolder', 'tool_usersuspension'));
-        $tabs[] = $testfromfolder;
-
         // Add logs tabs.
         $logs = static::pictabobject('logs', 'logs', 'tool_usersuspension',
             new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/log.php', $params + array('history' => 0)),
@@ -705,6 +785,12 @@ class util {
             new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/log.php', $params + array('history' => 1)),
                 get_string('table:log:all', 'tool_usersuspension'));
         $tabs[] = $logs;
+
+        // Add tests.
+        $testfromfolder = static::pictabobject('testfromfolder', null, 'tool_usersuspension',
+            new \moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/testfromfolder.php', $params),
+                get_string('testfromfolder', 'tool_usersuspension'));
+        $tabs[] = $testfromfolder;
 
         // Add notifications tabs.
         $notifications = static::pictabobject('notifications', null, 'tool_usersuspension',
@@ -723,6 +809,14 @@ class util {
         // Main plugin enabled.
         if (!(bool)config::get('enabled')) {
             $messages[] = get_string('config:tool:disabled', 'tool_usersuspension');
+        }
+        // Auto-suspend enabled.
+        if (!(bool)config::get('enable_smartdetect')) {
+            $messages[] = get_string('config:smartdetect:disabled', 'tool_usersuspension');
+        }
+        // Auto-delete enabled.
+        if (!(bool)config::get('enablecleanup')) {
+            $messages[] = get_string('config:cleanup:disabled', 'tool_usersuspension');
         }
         // Task(s).
         if (!(bool)config::get('enableunsuspendfromfolder')) {

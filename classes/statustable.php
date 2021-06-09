@@ -27,6 +27,7 @@ namespace tool_usersuspension;
 
 defined('MOODLE_INTERNAL') || die;
 require_once($CFG->libdir . '/tablelib.php');
+require_once($CFG->dirroot . '/user/filters/lib.php');
 
 /**
  * tool_usersuspension\util
@@ -92,6 +93,13 @@ class statustable extends \table_sql {
     protected $capuserupdate;
 
     /**
+     * Applied filters.
+     *
+     * @var \user_filtering
+     */
+    protected $userfiltering;
+
+    /**
      * Create a new instance of the statustable
      *
      * @param string $type table render type
@@ -108,11 +116,22 @@ class statustable extends \table_sql {
     }
 
     /**
+     * Set filtering.
+     *
+     * @param \user_filtering $userfiltering
+     * @return $this
+     */
+    public function set_filtering(\user_filtering $userfiltering) {
+        $this->userfiltering = $userfiltering;
+        return $this;
+    }
+
+    /**
      * Return a list of applicable viewtypes for this table
      *
      * @return array list of view types
      */
-    static public function get_viewtypes() {
+    public static function get_viewtypes() {
         return array(
             self::STATUS,
             self::SUSPENDED,
@@ -169,19 +188,34 @@ class statustable extends \table_sql {
      */
     protected function render_statusses($pagesize, $useinitialsbar = true) {
         global $DB;
-        $this->define_columns(array('username', 'name', 'lastlogin', 'timemodified', 'action'));
-        $this->define_headers(array(
+        $cols = array('username', 'name', 'lastlogin', 'timemodified');
+        $headers = array(
             get_string('thead:username', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:lastlogin', 'tool_usersuspension'),
-            get_string('thead:timemodified', 'tool_usersuspension'),
-            get_string('thead:action', 'tool_usersuspension'))
-        );
+            get_string('thead:timemodified', 'tool_usersuspension'));
+
+        if (!$this->is_downloading()) {
+            $cols[] = 'action';
+            $headers[] = get_string('thead:action', 'tool_usersuspension');
+        }
+
+        $this->define_columns($cols);
+        $this->define_headers($headers);
+
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.timemodified,u.suspended,u.deleted,NULL AS action';
-        $where = 'deleted = ?';
-        $params = array(0);
+        $where = 'deleted = :deleted';
+        $params = array('deleted' => 0);
         $this->add_exclude_users($where, $params);
+
+        // And apply filter(s).
+        list($fsqls, $fparams) = $this->userfiltering->get_sql_filter();
+        if (!empty($fsqls)) {
+            $where .= 'AND '. $fsqls;
+            $params = $params + $fparams;
+        }
+
         parent::set_sql($fields, '{user} u', $where, $params);
         $this->out($pagesize, $useinitialsbar);
     }
@@ -194,13 +228,34 @@ class statustable extends \table_sql {
      */
     protected function render_suspended($pagesize, $useinitialsbar = true) {
         global $DB;
-        $this->define_columns(array('username', 'name', 'lastlogin', 'timemodified', 'action'));
-        $this->define_headers(array('username', 'name', 'lastlogin', 'timemodified', 'action'));
+        $cols = array('username', 'name', 'lastlogin', 'timemodified');
+        $headers = array(
+            get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:name', 'tool_usersuspension'),
+            get_string('thead:lastlogin', 'tool_usersuspension'),
+            get_string('thead:timemodified', 'tool_usersuspension'));
+
+        if (!$this->is_downloading()) {
+            $cols[] = 'action';
+            $headers[] = get_string('thead:action', 'tool_usersuspension');
+        }
+
+        $this->define_columns($cols);
+        $this->define_headers($headers);
+
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.timemodified,u.suspended,u.deleted,NULL AS action';
-        $where = 'suspended = ? AND deleted = ?';
-        $params = array(1, 0);
+        $where = 'suspended = :suspended AND deleted = :deleted';
+        $params = array('suspended' => 1, 'deleted' => 0);
         $this->add_exclude_users($where, $params);
+
+        // And apply filter(s).
+        list($fsqls, $fparams) = $this->userfiltering->get_sql_filter();
+        if (!empty($fsqls)) {
+            $where .= 'AND '. $fsqls;
+            $params = $params + $fparams;
+        }
+
         parent::set_sql($fields, '{user} u', $where, $params);
         $this->out($pagesize, $useinitialsbar);
     }
@@ -214,20 +269,45 @@ class statustable extends \table_sql {
      */
     protected function render_to_suspend($pagesize, $useinitialsbar = true) {
         global $DB;
-        $this->define_columns(array('username', 'name', 'timedetect', 'suspendin', 'action'));
-        $this->define_headers(array('username', 'name', 'timedetect', 'suspendin', 'action'));
+        $cols = array('username', 'name', 'timedetect', 'suspendin');
+        $headers = array(
+            get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:name', 'tool_usersuspension'),
+            get_string('thead:timedetect', 'tool_usersuspension'),
+            get_string('thead:suspendin', 'tool_usersuspension'));
+
+        if (!$this->is_downloading()) {
+            $cols[] = 'action';
+            $headers[] = get_string('thead:action', 'tool_usersuspension');
+        }
+
+        $this->define_columns($cols);
+        $this->define_headers($headers);
 
         $suspendinsql = '('.config::get('smartdetect_suspendafter') .
-                ' - (UNIX_TIMESTAMP() - GREATEST(u.firstaccess, u.lastaccess, u.timemodified))) AS suspendin,';
+                ' - (:now - GREATEST(u.firstaccess, u.lastaccess, u.timemodified))) AS suspendin,';
+        $suspendonsql = '(GREATEST(u.firstaccess, u.lastaccess, u.timemodified) + ' .
+                config::get('smartdetect_suspendafter') . ') as suspendon,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,' .
                 'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
                 $suspendinsql.
+                $suspendonsql.
                 'NULL as action';
 
         list($where, $params) = util::get_suspension_query(false);
         list($where2, $params2) = util::get_suspension_query(true);
-        parent::set_sql($fields, '{user} u', "({$where}) OR ({$where2})", array_merge($params, $params2));
+        $where = "(({$where}) OR ({$where2}))";
+        $params = ['now' => time()] + $params + $params2;
+
+        // And apply filter(s).
+        list($fsqls, $fparams) = $this->userfiltering->get_sql_filter();
+        if (!empty($fsqls)) {
+            $where .= ' AND '. $fsqls;
+            $params = $params + $fparams;
+        }
+
+        parent::set_sql($fields, '{user} u', $where, $params);
         $this->out($pagesize, $useinitialsbar);
     }
 
@@ -240,20 +320,45 @@ class statustable extends \table_sql {
      */
     protected function render_to_delete($pagesize, $useinitialsbar = true) {
         global $DB;
-        $this->define_columns(array('username', 'name', 'timedetect', 'deletein', 'action'));
-        $this->define_headers(array('username', 'name', 'timedetect', 'deletein', 'action'));
+        $cols = array('username', 'name', 'timedetect', 'deletein');
+        $headers = array(
+            get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:name', 'tool_usersuspension'),
+            get_string('thead:timedetect', 'tool_usersuspension'),
+            get_string('thead:deletein', 'tool_usersuspension'));
+
+        if (!$this->is_downloading()) {
+            $cols[] = 'action';
+            $headers[] = get_string('thead:action', 'tool_usersuspension');
+        }
+
+        $this->define_columns($cols);
+        $this->define_headers($headers);
 
         $deleteinsql = '('.config::get('cleanup_deleteafter') .
-                ' - (UNIX_TIMESTAMP() - u.timemodified)) AS deletein,';
+                ' - (:now - u.timemodified)) AS deletein,';
+        $deleteonsql = '(GREATEST(u.firstaccess, u.lastaccess, u.timemodified) + ' .
+                config::get('cleanup_deleteafter') . ') as deleteon,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,'.
                 'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
                 $deleteinsql.
+                $deleteonsql.
                 'NULL as action';
 
         list($where, $params) = util::get_deletion_query(false);
         list($where2, $params2) = util::get_deletion_query(true);
-        parent::set_sql($fields, '{user} u', "({$where}) OR ({$where2})", array_merge($params, $params2));
+        $where = "(({$where}) OR ({$where2}))";
+        $params = ['now' => time()] + $params + $params2;
+
+        // And apply filter(s).
+        list($fsqls, $fparams) = $this->userfiltering->get_sql_filter();
+        if (!empty($fsqls)) {
+            $where .= ' AND '. $fsqls;
+            $params = $params + $fparams;
+        }
+
+        parent::set_sql($fields, '{user} u', $where, $params);
         $this->out($pagesize, $useinitialsbar);
     }
 
@@ -280,6 +385,9 @@ class statustable extends \table_sql {
      */
     public function col_username($row) {
         global $CFG;
+        if ($this->is_downloading()) {
+            return $row->username;
+        }
         $link = new \moodle_url($CFG->wwwroot . '/user/profile.php', array('id' => $row->id));
         return '<a href="' . $link->out() . '">' . $row->username . '</a>';
     }
@@ -311,7 +419,7 @@ class statustable extends \table_sql {
      * @return string actions
      */
     public function col_suspendin($row) {
-        return util::format_timespan($row->suspendin);
+        return util::format_timespan($row->suspendin).'<br/>('.userdate($row->suspendon).')';
     }
 
     /**
@@ -321,9 +429,7 @@ class statustable extends \table_sql {
      * @return string actions
      */
     public function col_deletein($row) {
-        $diff = time() - $row->timemodified;
-        $time = config::get('cleanup_deleteafter') - $diff;
-        return util::format_timespan($time). '<br/>'.util::format_timespan($row->deletein);
+        return util::format_timespan($row->deletein).'<br/>('.userdate($row->deleteon).')';
     }
 
     /**

@@ -1,3 +1,13 @@
+Version 3.5.7 (build 2020121502)
+* Added download option + filtering options for status table.
+* Pretty substantial code overhaul to use NAMED parameters (due to added filters).
+* Merge changes from Catalyst IT's Totara specific branch.
+* Added OPTION to send warnings instead of relying on the smartdetect option.
+* Added more informative messages.
+* Code overhaul because codechecker keeps whining about visibility declaration (pffft).
+
+----------
+
 Version 3.5.6 (build 2020121501)
 * Added tab and script to test configuration of unattended suspension/unsuspension ("from folder" option).
 

@@ -15,24 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for tool usersuspension
- *
- * File         version.php
- * Encoding     UTF-8
+ * Callback point for tool usersuspension
  *
  * @package     tool_usersuspension
- *
  * @copyright   Sebsoft.nl
  * @author      R.J. van Dongen <rogier@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
-defined('MOODLE_INTERNAL') || die;
 
-$plugin = new stdClass();
-$plugin->version   = 2021060800;
-$plugin->requires  = 2018050200;      // YYYYMMDDHH (This is the release version for Moodle 3.5).
-$plugin->cron      = 0;
-$plugin->component = 'tool_usersuspension'; // Full name of the plugin (used for diagnostics).
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.5.7 (build 2021060800)';
-$plugin->dependencies = array();
+defined('MOODLE_INTERNAL') || die('moodle_internal not defined');
+
+/**
+ * Execute/inject code before sending HTTP headers.
+ */
+function tool_usersuspension_before_http_headers() {
+    global $SESSION;
+
+    if (!isloggedin() || isguestuser()) {
+        return;
+    }
+
+    if (!empty($SESSION->warncheck)) {
+        return;
+    }
+
+    if (get_user_preferences('tool_usersuspension_warned', false)) {
+        unset_user_preference('tool_usersuspension_warned');
+    }
+
+    $SESSION->warncheck = true;
+}

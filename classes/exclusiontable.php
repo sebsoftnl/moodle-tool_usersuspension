@@ -133,12 +133,13 @@ class exclusiontable extends \flexible_table {
      */
     protected function get_type_users_sql() {
         global $DB;
+        $pfx = util::get_prefix();
         $fields = 'e.id,e.type,u.id as refid,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,e.timecreated,null AS action';
         $from = '{tool_usersuspension_excl} e JOIN {user} u ON e.refid=u.id';
-        $where = 'type = ?';
+        $where = "type = :{$pfx}type";
         $sql = "SELECT $fields FROM $from WHERE $where";
-        return array($sql, array('user'));
+        return array($sql, array("{$pfx}type" => 'user'));
     }
 
     /**
@@ -166,11 +167,12 @@ class exclusiontable extends \flexible_table {
      * @return array
      */
     protected function get_type_cohorts_sql() {
+        $pfx = util::get_prefix();
         $fields = 'e.id,e.type,c.id as refid,c.name,e.timecreated,null AS action';
         $from = '{tool_usersuspension_excl} e JOIN {cohort} c ON e.refid=c.id';
-        $where = 'type = ?';
+        $where = "type = :{$pfx}type";
         $sql = "SELECT $fields FROM $from WHERE $where";
-        return array($sql, array('cohort'));
+        return array($sql, array("{$pfx}type" => 'cohort'));
     }
 
     /**

@@ -28,7 +28,11 @@
  */
 
 require_once(dirname(__FILE__) . '/../../../../config.php');
-require_once($CFG->libdir.'/adminlib.php');
+
+require_once($CFG->libdir . '/adminlib.php');
+require_once($CFG->dirroot . '/user/filters/lib.php');
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 admin_externalpage_setup('toolusersuspension');
 $context       = \context_system::instance();
@@ -76,6 +80,42 @@ if ($action === 'exclude') {
     }
     redirect($thispageurl, $message, 5);
 } else {
+    // Prepare specific filter fields and detect whether or not the current view is applicable.
+    $viewtypeenabled = true;
+    $viewtypenotification = '';
+    $fields = ['realname' => 0, 'username' => 0];
+    switch ($viewtype) {
+        case \tool_usersuspension\statustable::DELETE:
+            $fields['deleteon'] = 0;
+            $viewtypeenabled = (bool) \tool_usersuspension\config::get('enablecleanup');
+            if (!$viewtypeenabled) {
+                $viewtypenotification = get_string('config:cleanup:disabled', 'tool_usersuspension');
+                $viewtypenotification .= '<br/>'. get_string('configoption:notactive', 'tool_usersuspension');
+            }
+            break;
+        case \tool_usersuspension\statustable::TOSUSPEND:
+            $fields['suspendon'] = 0;
+            $viewtypeenabled = (bool) \tool_usersuspension\config::get('enable_smartdetect');
+            if (!$viewtypeenabled) {
+                $viewtypenotification = get_string('config:smartdetect:disabled', 'tool_usersuspension');
+                $viewtypenotification .= '<br/>'. get_string('configoption:notactive', 'tool_usersuspension');
+            }
+            break;
+    }
+
+    $table = new \tool_usersuspension\statustable($viewtype);
+    $table->baseurl = $thispageurl;
+    $table->is_downloadable(true);
+
+    $userfiltering = new \tool_usersuspension\statustable_filtering($viewtype, $fields, $table->baseurl);
+    $table->set_filtering($userfiltering);
+
+    $download = optional_param('download', null, PARAM_ALPHA);
+    if ($table->is_downloading($download, 'usersuspension-statustable-' . $viewtype, $viewtype)) {
+        $table->render(0);
+        exit;
+    }
+
     echo $OUTPUT->header();
     echo '<div class="tool-usersuspension-container">';
     echo '<div>';
@@ -83,8 +123,13 @@ if ($action === 'exclude') {
     echo '</div>';
     echo '<div>' . get_string('page:view:statuslist.php:introduction:' . $viewtype, 'tool_usersuspension') . '</div>';
     echo '<div>';
-    $table = new \tool_usersuspension\statustable($viewtype);
-    $table->baseurl = $thispageurl;
+    if (!empty($viewtypenotification)) {
+        echo '<div class="alert alert-info">';
+        echo $viewtypenotification;
+        echo '</div>';
+    }
+    $userfiltering->display_add();
+    $userfiltering->display_active();
     $table->render(25);
     echo '</div>';
     echo '</div>';

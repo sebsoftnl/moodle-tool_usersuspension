@@ -142,6 +142,16 @@ if ($hassiteconfig) {
             get_string('setting:smartdetect_suspendafter', 'tool_usersuspension'),
             get_string('setting:desc:smartdetect_suspendafter', 'tool_usersuspension'),
             90 * 86400, 86400));
+    // Warnings to users about suspension at hand.
+    $temp->add(new admin_setting_configcheckbox('tool_usersuspension/enablesmartdetect_warning',
+            get_string('setting:enablesmartdetectwarning', 'tool_usersuspension'),
+            get_string('setting:desc:enablesmartdetectwarning', 'tool_usersuspension'),
+            '1', '1', '0'));
+    $temp->add(new admin_setting_configduration('tool_usersuspension/smartdetect_warninginterval',
+            get_string('setting:smartdetect_warninginterval', 'tool_usersuspension'),
+            get_string('setting:desc:smartdetect_warninginterval', 'tool_usersuspension'),
+            14 * 86400, 86400));
+
 
     // Cleanup settings.
     $temp->add(new admin_setting_heading('tool_usersuspension_suspensionsettingscleanup',
@@ -166,8 +176,8 @@ if ($hassiteconfig) {
             60 * 86400, 86400));
 
     $ADMIN->add('tools', $temp);
-}
 
-$ADMIN->add('accounts', new admin_externalpage('toolusersuspension', get_string('pluginname', 'tool_usersuspension'),
-    "{$CFG->wwwroot}/{$CFG->admin}/tool/usersuspension/view/exclude.php", 'moodle/user:update'
-));
+    $ADMIN->add('accounts', new admin_externalpage('toolusersuspension', get_string('pluginname', 'tool_usersuspension'),
+        "{$CFG->wwwroot}/{$CFG->admin}/tool/usersuspension/view/exclude.php", 'moodle/user:update'
+    ));
+}

@@ -47,7 +47,9 @@ class cohort extends \moodleform {
         global $DB;
         $mform = $this->_form;
 
-        $excludedcohorts = $DB->get_fieldset_select('tool_usersuspension_excl', 'refid', 'type = ?', array('cohort'));
+        $pfx = \tool_usersuspension\util::get_prefix();
+        $excludedcohorts = $DB->get_fieldset_select('tool_usersuspension_excl', 'refid',
+                "type = :{$pfx}type", array("{$pfx}type" => 'cohort'));
         list($sqlin, $params) = $DB->get_in_or_equal($excludedcohorts, SQL_PARAMS_QM, 'param', false, true);
         $cohorts = $DB->get_records_sql_menu('SELECT id,name FROM {cohort} WHERE id '. $sqlin, $params);
         if (count($cohorts) == 0) {
