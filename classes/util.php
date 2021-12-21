@@ -811,7 +811,7 @@ class util {
             $messages[] = get_string('config:tool:disabled', 'tool_usersuspension');
         }
         // Auto-suspend enabled.
-        if (!(bool)config::get('enable_smartdetect')) {
+        if (!(bool)config::get('enablesmartdetect')) {
             $messages[] = get_string('config:smartdetect:disabled', 'tool_usersuspension');
         }
         // Auto-delete enabled.

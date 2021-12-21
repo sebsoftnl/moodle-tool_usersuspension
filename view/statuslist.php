@@ -95,7 +95,7 @@ if ($action === 'exclude') {
             break;
         case \tool_usersuspension\statustable::TOSUSPEND:
             $fields['suspendon'] = 0;
-            $viewtypeenabled = (bool) \tool_usersuspension\config::get('enable_smartdetect');
+            $viewtypeenabled = (bool) \tool_usersuspension\config::get('enablesmartdetect');
             if (!$viewtypeenabled) {
                 $viewtypenotification = get_string('config:smartdetect:disabled', 'tool_usersuspension');
                 $viewtypenotification .= '<br/>'. get_string('configoption:notactive', 'tool_usersuspension');
