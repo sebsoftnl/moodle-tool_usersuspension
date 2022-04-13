@@ -1,3 +1,9 @@
+Version 3.5.9 (build 2022041300)
+* Fixed GREATEST for MSSQL - no more fatals on SQL Server for the tables.
+* Merged config name typo PR (thanks Krzysztof Glebowicz!).
+
+----------
+
 Version 3.5.8 (build 2021060800)
 * Removed upload interval detect setting and replaced with message this must be adjusted in the scheduled tasks.
 * Fixed using wrong language string.

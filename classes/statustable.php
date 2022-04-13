@@ -284,13 +284,23 @@ class statustable extends \table_sql {
         $this->define_columns($cols);
         $this->define_headers($headers);
 
+        switch ($DB->get_dbfamily()) {
+            case 'mssql':
+                $sqlpartgreatest = 'IIF(u.lastaccess >= u.firstaccess, ' .
+                    'IIF(u.timemodified >= u.lastaccess, u.timemodified, u.lastaccess), u.firstaccess)';
+                break;
+            default:
+                $sqlpartgreatest = 'GREATEST(u.firstaccess, u.lastaccess, u.timemodified)';
+                break;
+        }
+
         $suspendinsql = '('.config::get('smartdetect_suspendafter') .
-                ' - (:now - GREATEST(u.firstaccess, u.lastaccess, u.timemodified))) AS suspendin,';
-        $suspendonsql = '(GREATEST(u.firstaccess, u.lastaccess, u.timemodified) + ' .
+                ' - (:now - '.$sqlpartgreatest.')) AS suspendin,';
+        $suspendonsql = '(' . $sqlpartgreatest . ' + ' .
                 config::get('smartdetect_suspendafter') . ') as suspendon,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,' .
-                'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
+                $sqlpartgreatest . ' AS timedetect,'.
                 $suspendinsql.
                 $suspendonsql.
                 'NULL as action';
@@ -335,13 +345,23 @@ class statustable extends \table_sql {
         $this->define_columns($cols);
         $this->define_headers($headers);
 
+        switch ($DB->get_dbfamily()) {
+            case 'mssql':
+                $sqlpartgreatest = 'IIF(u.lastaccess >= u.firstaccess, ' .
+                    'IIF(u.timemodified >= u.lastaccess, u.timemodified, u.lastaccess), u.firstaccess)';
+                break;
+            default:
+                $sqlpartgreatest = 'GREATEST(u.firstaccess, u.lastaccess, u.timemodified)';
+                break;
+        }
+
         $deleteinsql = '('.config::get('cleanup_deleteafter') .
                 ' - (:now - u.timemodified)) AS deletein,';
-        $deleteonsql = '(GREATEST(u.firstaccess, u.lastaccess, u.timemodified) + ' .
+        $deleteonsql = '(' . $sqlpartgreatest . ' + ' .
                 config::get('cleanup_deleteafter') . ') as deleteon,';
         $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,'.
-                'GREATEST(u.firstaccess, u.lastaccess, u.timemodified) AS timedetect,'.
+                $sqlpartgreatest . ' AS timedetect,'.
                 $deleteinsql.
                 $deleteonsql.
                 'NULL as action';

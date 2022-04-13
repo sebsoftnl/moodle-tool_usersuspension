@@ -161,16 +161,26 @@ class statustable_filtering extends user_filtering {
     public function get_field($fieldname, $advanced) {
         global $USER, $CFG, $DB, $SITE;
 
+        switch ($DB->get_dbfamily()) {
+            case 'mssql':
+                $sqlpartgreatest = 'IIF(u.lastaccess >= u.firstaccess, ' .
+                    'IIF(u.timemodified >= u.lastaccess, u.timemodified, u.lastaccess), u.firstaccess)';
+                break;
+            default:
+                $sqlpartgreatest = 'GREATEST(u.firstaccess, u.lastaccess, u.timemodified)';
+                break;
+        }
+
         switch ($fieldname) {
             case 'suspendon':
                 // Mimic the field as SQL, because it's NOT a real field.
-                $field = '(GREATEST(u.firstaccess, u.lastaccess, u.timemodified) + ' .
+                $field = '(' . $sqlpartgreatest . ' + ' .
                     config::get('smartdetect_suspendafter') . ')';
                 return new \user_filter_date('suspendon', get_string('suspendon', 'tool_usersuspension'),
                         $advanced, $field);
             case 'deleteon':
                 // Mimic the field as SQL, because it's NOT a real field.
-                $field = '(GREATEST(u.firstaccess, u.lastaccess, u.timemodified) + ' .
+                $field = '(' . $sqlpartgreatest . ' + ' .
                     config::get('cleanup_deleteafter') . ')';
                 return new \user_filter_date('deleteon', get_string('deleteon', 'tool_usersuspension'),
                         $advanced, $field);
