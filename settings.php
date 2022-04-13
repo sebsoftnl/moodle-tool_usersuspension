@@ -90,10 +90,9 @@ if ($hassiteconfig) {
             get_string('setting:unsuspenduploadfilename', 'tool_usersuspension'),
             get_string('setting:desc:unsuspenduploadfilename', 'tool_usersuspension'),
             ''));
-    $temp->add(new admin_setting_configduration('tool_usersuspension/uploaddetect_interval',
-            get_string('setting:uploaddetect_interval', 'tool_usersuspension'),
-            get_string('setting:desc:uploaddetect_interval', 'tool_usersuspension'),
-            3600, 3600));
+    $temp->add(new admin_setting_description('tool_usersuspension/uploaddetect_interval',
+            get_string('setting:dep:uploaddetect_interval', 'tool_usersuspension'),
+            get_string('setting:dep:desc:uploaddetect_interval', 'tool_usersuspension', $CFG->wwwroot)));
 
     require_once($CFG->libdir . '/csvlib.class.php');
     $choices = csv_import_reader::get_delimiter_list();
@@ -160,7 +159,7 @@ if ($hassiteconfig) {
     $temp->add(new admin_setting_configcheckbox('tool_usersuspension/enablecleanup',
             get_string('setting:enablecleanup', 'tool_usersuspension'),
             get_string('setting:desc:enablecleanup', 'tool_usersuspension'),
-            '1', '1', '0'));
+            '0', '1', '0'));
     $temp->add(new admin_setting_configcheckbox('tool_usersuspension/send_delete_email',
             get_string('setting:senddeleteemail', 'tool_usersuspension'),
             get_string('setting:desc:senddeleteemail', 'tool_usersuspension'),

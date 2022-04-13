@@ -257,3 +257,10 @@ $string['config:uploadfile:exists'] = 'Upload bestand "{$a}" bestaat';
 $string['msg:file-would-delete'] = 'Geupload bestand zou nu worden verwijderd (indien dit geen validatie/testrun van globale instellingen was)';
 $string['testing:suspendfromfolder'] = 'Ingestelde configuratie testen voor "schorsen vanaf geupload bestand"';
 $string['testing:unsuspendfromfolder'] = 'Ingestelde configuratie testen voor "ontschorsen vanaf geupload bestand"';
+
+// Upload detection is deprecated; this is the new description.
+$string['setting:dep:uploaddetect_interval'] = 'Upload folder verwerkingsinterval';
+$string['setting:dep:desc:uploaddetect_interval'] = 'Om het interval waarmee gegevens in de upload folder verwerkt worden aan te passen,
+dien je de frequentie waarmee de achtergrondtaken draaien aan te passen. Je kunt dit <a href="{$a}/admin/tool/task/scheduledtasks.php">hier</a> doen
+(zoek naar de taken "\tool_usersuspension\task\suspend\fromfolder" en "\tool_usersuspension\task\unsuspend\fromfolder").';
+$string['event:user:suspended'] = 'Gebruiker geschorst.';

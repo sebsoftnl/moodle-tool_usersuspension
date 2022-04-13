@@ -269,3 +269,10 @@ $string['testing:unsuspendfromfolder'] = 'Testing configuration for "unsuspend f
 // Access strings.
 $string['usersuspension:administration'] = 'User suspension administration';
 $string['usersuspension:viewstatus'] = 'View user suspension status';
+
+// Upload detection is deprecated; this is the new description.
+$string['setting:dep:uploaddetect_interval'] = 'Upload folder processing interval';
+$string['setting:dep:desc:uploaddetect_interval'] = 'To change the interval at which the upload folder is checked and processed,
+ please adjust the interval at which the dedicated scheduled task runs to facilitate this proces <a href="{$a}/admin/tool/task/scheduledtasks.php">here</a>
+ (look for tasks "\tool_usersuspension\task\suspend\fromfolder" and "\tool_usersuspension\task\unsuspend\fromfolder").';
+$string['event:user:suspended'] = 'User suspended.';

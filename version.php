@@ -34,5 +34,5 @@ $plugin->requires  = 2018050200;      // YYYYMMDDHH (This is the release version
 $plugin->cron      = 0;
 $plugin->component = 'tool_usersuspension'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.5.7 (build 2021060800)';
+$plugin->release   = '3.5.8 (build 2021060800)';
 $plugin->dependencies = array();

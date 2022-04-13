@@ -1,3 +1,11 @@
+Version 3.5.8 (build 2021060800)
+* Removed upload interval detect setting and replaced with message this must be adjusted in the scheduled tasks.
+* Fixed using wrong language string.
+* Added 1 missing string.
+* Fixed some minor coding standards issues.
+
+----------
+
 Version 3.5.7 (build 2020121502)
 * Added download option + filtering options for status table.
 * Pretty substantial code overhaul to use NAMED parameters (due to added filters).

@@ -340,7 +340,7 @@ class csv {
             // Suspend this user.
             if ($this->testmode) {
                 $result = true;
-                $this->notify(get_string('msg:user:suspend:testmodemode', 'tool_usersuspension', $user));
+                $this->notify(get_string('msg:user:suspend:nosuspendmode', 'tool_usersuspension', $user));
                 return $result;
             }
             $result = \tool_usersuspension\util::do_suspend_user($user);
@@ -379,7 +379,7 @@ class csv {
             // Suspend this user.
             if ($this->testmode) {
                 $result = true;
-                $this->notify(get_string('msg:user:suspend:testmodemode', 'tool_usersuspension', $user));
+                $this->notify(get_string('msg:user:suspend:nosuspendmode', 'tool_usersuspension', $user));
                 return $result;
             }
             $result = \tool_usersuspension\util::do_unsuspend_user($user);
