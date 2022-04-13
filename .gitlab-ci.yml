@@ -1,10 +1,7 @@
-services:
-  - mysql:5.7
-
-cache:
-  paths:
-    - $HOME/.composer/cache
-    - $HOME/.npm
+stages:
+  - test
+  - deploy
+  - release
 
 variables:
   DB: "mysqli"
@@ -13,76 +10,140 @@ variables:
   MOODLE_DIR: "/var/www/html/moodle"
   # If we want to ignore some templates, provide them here.
   #MUSTACHE_IGNORE_NAMES: "<file>.mustache, <file2>.mustache, ..., <filen>.mustache"
+  PLUGIN: 'tool_usersuspension'
+  REPOURL: 'https://github.com/sebsoftnl/moodle-tool_usersuspension'
+  REPOSYS: 'git'
+  # Moodle auto format = 0, Markdown = 4, Flat txt = 2
+  RELEASENOTEFORMAT: '0'
+  PATHNAME: 'admin/tool/usersuspension'
 
-before_script:
-  # Update packages and install git, mysql-client and npm.
-  - apt update && apt install -y git default-mysql-client npm
-  # Install old version of openjdk-8 in due of MDLSITE-5739.
-  - mkdir -p /usr/share/man/man1 #https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=863199
-  - apt install -y software-properties-common
-  - add-apt-repository --yes 'deb http://security.debian.org/debian-security stretch/updates main'
-  - apt update && apt install -y openjdk-8-jdk-headless
-  - java -version
-  # Install nvm and NodeJS.
-  - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
-  - source $HOME/.nvm/nvm.sh
-  - nvm install 14.2.0
-  # Install composer.
-  - curl -sS https://getcomposer.org/installer | php
-  - mv composer.phar /usr/local/bin/composer
-  # Install Moodle CI plugin
-  # Hint: moodle-plugin-ci already exists but has some missing commands, therefore we re-install it.
-  - cd $HOME && rm -rf ci
-  - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
-  - export PATH="$(cd $HOME/ci/bin; pwd):$(cd $HOME/ci/vendor/bin; pwd):$PATH"
-  - chmod u+x $HOME/ci/bin/moodle-plugin-ci
-  - chmod u+x $HOME/ci/bin/*
-  - umask u+x
-  - cd $CI_PROJECT_DIR/..
-  - moodle-plugin-ci install --moodle=$MOODLE_DIR --db-user=root --db-pass=superrootpass --db-host=mysql -vvv
 
 .job_template: &job_definition
-  allow_failure: true
-  image: moodlehq/moodle-php-apache:7.4
+  stage: test
+  services:
+    - mysql:5.7
+  cache:
+    paths:
+      - $HOME/.composer/cache
+      - $HOME/.npm
+  allow_failure: false
+  image: git.sebsoft.nl:5050/sebsoft/open-source/moodle-cidocker:latest
   script:
-    - moodle-plugin-ci phplint
-    - moodle-plugin-ci phpcpd
-    - moodle-plugin-ci phpmd
-    - moodle-plugin-ci codechecker
-    - moodle-plugin-ci validate
-    - moodle-plugin-ci savepoints
-    - moodle-plugin-ci mustache
-    - moodle-plugin-ci grunt
-    - moodle-plugin-ci phpdoc || true
-    - moodle-plugin-ci phpunit
-    - moodle-plugin-ci behat
+    - cd /root/
+    - umask u+x
+    - cd $CI_PROJECT_DIR/..
+    - source /root/.nvm/nvm.sh
+    - /root/ci/bin/moodle-plugin-ci install --moodle=$MOODLE_DIR --db-user=root --db-pass=superrootpass --db-host=mysql -vvv
+    # Start actually running the CI now.
+    - exit_code+=(0)
+    - /root/ci/bin/moodle-plugin-ci phplint || exit_code+=($?)
+    # Skip cpd
+    - /root/ci/bin/moodle-plugin-ci phpcpd || true
+    - /root/ci/bin/moodle-plugin-ci phpmd || exit_code+=($?)
+    - /root/ci/bin/moodle-plugin-ci codechecker || exit_code+=($?)
+    - /root/ci/bin/moodle-plugin-ci validate || exit_code+=($?)
+    - /root/ci/bin/moodle-plugin-ci savepoints || exit_code+=($?)
+    - /root/ci/bin/moodle-plugin-ci mustache || exit_code+=($?)
+    - /root/ci/bin/moodle-plugin-ci grunt || exit_code+=($?)
+    # Skip phpdoc
+    - /root/ci/bin/moodle-plugin-ci phpdoc || true
+    - /root/ci/bin/moodle-plugin-ci phpunit || exit_code+=($?)
+    - /root/ci/bin/moodle-plugin-ci behat || exit_code+=($?)
+    - echo "Final testing... Have we entered all language variables correctly?"
+    - cd /var/www/html/moodle
+    - if [ "$MOODLE_VERSION" -ge "39" ]; then echo "Langcheck is supported."; /usr/local/bin/moosh -p /var/www/html/moodle/ -n dev-langusage $PATHNAME; fi
+    - if [ "$MOODLE_VERSION" -ge "39" ]; then echo "Langcheck is supported."; if [ "$(/usr/local/bin/moosh -p /var/www/html/moodle/ -n dev-langusage $PATHNAME 2>/dev/null | grep '... missing' -c)" != "0" ]; then echo "Please check there are no missing language strings."; exit 1; else echo "No issues with languages detected"; fi; else echo "Moodle version $MOODLE_VERSION is too old to do correct langcheck, skipping test."; fi;
+    - for i in ${exit_code[@]}; do echo "Exit code ${exit_code[$i]}"; if [ "${exit_code[$i]}" -gt 0 ]; then exit 1; fi; done;
+
+
+# Add more versions if you want/need.
+Moodle 4.0:
+  <<: *job_definition
+  variables:
+    MOODLE_BRANCH: "master"
+    MOODLE_VERSION: 400
+
+Moodle 3.11:
+  <<: *job_definition
+  variables:
+    MOODLE_BRANCH: "MOODLE_311_STABLE"
+    MOODLE_VERSION: 311
 
 Moodle 3.10:
   <<: *job_definition
   variables:
     MOODLE_BRANCH: "MOODLE_310_STABLE"
-    
+    MOODLE_VERSION: 310
+
 Moodle 3.9:
   <<: *job_definition
   variables:
     MOODLE_BRANCH: "MOODLE_39_STABLE"
-    
+    MOODLE_VERSION: 39
+
 Moodle 3.8:
   <<: *job_definition
   variables:
-    MOODLE_BRANCH: "MOODLE_38_STABLE" 
+    MOODLE_BRANCH: "MOODLE_38_STABLE"
+    MOODLE_VERSION: 38
 
 Moodle 3.7:
   <<: *job_definition
   variables:
-    MOODLE_BRANCH: "MOODLE_37_STABLE" 
+    MOODLE_BRANCH: "MOODLE_37_STABLE"
+    MOODLE_VERSION: 37
 
-Moodle 3.6:
-  <<: *job_definition
-  variables:
-    MOODLE_BRANCH: "MOODLE_36_STABLE" 
+    #The deploy will create the release in Gitlab. This is required after a tag has been created
+deploy.gitlab:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
+  script:
+    - echo 'running deploy to create release in Gitlab'
+  release:
+    name: 'Release $CI_COMMIT_TAG'
+    description: './CHANGES.md'  # Just read the changes from changes.md
+    tag_name: '$CI_COMMIT_TAG'
+    ref: '$CI_COMMIT_TAG'
 
-Moodle 3.5:
-  <<: *job_definition
-  variables:
-    MOODLE_BRANCH: "MOODLE_35_STABLE" 
+deploy.github:
+  stage: deploy
+  image: moodlehq/moodle-php-apache:7.4
+  script:
+    - echo "Deploying to Github..."
+    - git checkout -b master
+    - if [ "$(git remote | grep github | wc -l)" -eq "0" ]; then git remote add github $PUSHLOCATION; fi
+    - git branch -M master
+    - git push -u github master
+    - git push -u github --tags
+    - echo "Deploy to Github completed..."
+  only:
+    - tags
+
+# After the deploy has been done, it's ready to be released to Moodle.org.
+release:
+  image: php:7.4-cli
+  stage: release
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - echo "Releasing this to Moodle.org"
+    - apt-get update
+    - apt-get -y install zip curl jq
+    - mkdir -p /tmp/release/$PLUGIN
+    - cp -Rfv ./ /tmp/release/$PLUGIN/
+    - cd /tmp/release
+    - zip -r /tmp/newbuild.zip ./ -x '*.git*'
+    - ITEMID=$(curl -s -F data=@/tmp/newbuild.zip "https://moodle.org/webservice/upload.php?token=$MOODLE_ORG_TOKEN" | jq --raw-output '.[0].itemid')
+    - curl -s https://moodle.org/webservice/rest/server.php
+      --data-urlencode "wstoken=${MOODLE_ORG_TOKEN}"
+      --data-urlencode "wsfunction=local_plugins_add_version"
+      --data-urlencode "moodlewsrestformat=json"
+      --data-urlencode "frankenstyle=${PLUGIN}"
+      --data-urlencode "zipdrafitemtid=${ITEMID}"
+      --data-urlencode "vcsrepositoryurl=${REPOURL}"
+      --data-urlencode "vcssystem=${REPOSYS}"
+      --data-urlencode "releasenotesformat=${RELEASENOTEFORMAT}"
+      --data-urlencode "vcstag=${CI_COMMIT_TAG}" | jq
+
