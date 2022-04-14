@@ -1,3 +1,9 @@
+Version 3.5.9 (build 2022041301)
+* Still no idea where all these CRLF's keep coming from and why they keep returning.
+* Removed useless sqlserver test file used for dev purposes.
+
+----------
+
 Version 3.5.9 (build 2022041300)
 * Fixed GREATEST for MSSQL - no more fatals on SQL Server for the tables.
 * Merged config name typo PR (thanks Krzysztof Glebowicz!).
