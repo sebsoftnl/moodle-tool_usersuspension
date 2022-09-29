@@ -23,8 +23,6 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  **/
 
-defined('MOODLE_INTERNAL') || die('moodle_internal not defined');
-
 /**
  * Execute/inject code before sending HTTP headers.
  */

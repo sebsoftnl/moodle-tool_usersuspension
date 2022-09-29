@@ -25,8 +25,6 @@
 
 namespace tool_usersuspension;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * tool_usersuspension\config
  *
@@ -67,8 +65,8 @@ class config {
      */
     public static function get($name) {
         self::init();
-        if (isset(self::$config->$name)) {
-            return self::$config->$name;
+        if (isset(self::$config->{$name})) {
+            return self::$config->{$name};
         }
         return null;
     }

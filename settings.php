@@ -151,7 +151,6 @@ if ($hassiteconfig) {
             get_string('setting:desc:smartdetect_warninginterval', 'tool_usersuspension'),
             14 * 86400, 86400));
 
-
     // Cleanup settings.
     $temp->add(new admin_setting_heading('tool_usersuspension_suspensionsettingscleanup',
             get_string('suspensionsettingscleanup', 'tool_usersuspension'),

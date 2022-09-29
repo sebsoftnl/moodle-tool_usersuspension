@@ -25,8 +25,6 @@
 
 namespace tool_usersuspension\processor;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Description of csv
  *

@@ -131,7 +131,7 @@ class statustable_filtering extends user_filtering {
             if (!empty($adddata->removeall)) {
                 $SESSION->{$filterid} = array();
 
-            } else if (!empty($adddata->removeselected) and !empty($adddata->filter)) {
+            } else if (!empty($adddata->removeselected) && !empty($adddata->filter)) {
                 foreach ($adddata->filter as $fname => $instances) {
                     foreach ($instances as $i => $val) {
                         if (empty($val)) {
@@ -159,7 +159,7 @@ class statustable_filtering extends user_filtering {
      * @return object filter
      */
     public function get_field($fieldname, $advanced) {
-        global $USER, $CFG, $DB, $SITE;
+        global $DB;
 
         switch ($DB->get_dbfamily()) {
             case 'mssql':
@@ -215,7 +215,7 @@ class statustable_filtering extends user_filtering {
                     continue; // Filter not used.
                 }
                 $field = $this->_fields[$fname];
-                foreach ($datas as $i => $data) {
+                foreach ($datas as $data) {
                     list($s, $p) = $field->get_sql_filter($data);
                     $sqls[] = $s;
                     $params = $params + $p;

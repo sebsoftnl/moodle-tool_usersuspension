@@ -68,9 +68,9 @@ class current extends \user_selector_base {
         $order = ' ORDER BY ' . $sort;
 
         if (!$this->is_validating()) {
-            $potentialmemberscount = $DB->count_records_sql($countfields . $sql, $params);
-            if ($potentialmemberscount > $this->maxusersperpage) {
-                return $this->too_many_results($search, $potentialmemberscount);
+            $counter = $DB->count_records_sql($countfields . $sql, $params);
+            if ($counter > $this->maxusersperpage) {
+                return $this->too_many_results($search, $counter);
             }
         }
 
