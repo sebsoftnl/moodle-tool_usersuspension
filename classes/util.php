@@ -257,7 +257,7 @@ class util {
      * @param string $type
      */
     final protected static function set_lastrun_config($type) {
-        set_config(time(), $type . '_lastrun', 'tool_usersuspension');
+        set_config($type . '_lastrun', time(), 'tool_usersuspension');
     }
 
     /**
