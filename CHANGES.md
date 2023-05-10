@@ -1,3 +1,8 @@
+Version 4.0.1 (build 2022090102)
+* Fix for set_config from projectbadger: Fixes lastrun config and smart detection.
+
+----------
+
 Version 3.5.9 (build 2022041301)
 * Still no idea where all these CRLF's keep coming from and why they keep returning.
 * Removed useless sqlserver test file used for dev purposes.
