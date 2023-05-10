@@ -66,7 +66,7 @@ $string['setting:enablefromupload'] = 'Enable suspension of users from uploaded 
 $string['setting:desc:enablefromupload'] = 'Enables or disables user suspension from an uploaded file';
 $string['suspensionsettingssmartdetect'] = 'Smart detection';
 $string['suspensionsettingssmartdetectdesc'] = 'Configure the smart detection settings below.<br/>
-Smart detection will automatically suspend user accounts that have been found to be \'inactive\' according to the settings below. 
+Smart detection will automatically suspend user accounts that have been found to be \'inactive\' according to the settings below.
 Running only at a configured interval, \'smart detection\' will determine whether or not a user account
 is active according to the configured \'Inactivity suspension time threshold\' setting, and will suspend all user accounts found to be inactive.';
 $string['setting:enablesmartdetect'] = 'Enable Smart Detection';
@@ -107,9 +107,9 @@ the configured timeframe in this tool\'s settings</p>';
 $string['page:view:statuslist.php:introduction:suspended'] = '<p>This overview shows the user accounts that have been suspended.</p>';
 $string['page:view:statuslist.php:introduction:tosuspend'] = '<p>This overview shows the user accounts that will get suspended within
 the configured timeframe of this tool\'s settings</p>';
-$string['page:view:log.php:introduction'] = 'The table below shows the logs of statuses that users had assigned, either by automated processing or usage of 
-this tool. The table will show, depending on your configuration, the suspension status or deleted status of your users and 
-the timestamp at which certain actions were performed.';
+$string['page:view:log.php:introduction'] = 'The table below shows the logs of statuses that users had assigned, either by automated processing or usage of
+ this tool. The table will show, depending on your configuration, the suspension status or deleted status of your users and
+ the timestamp at which certain actions were performed.';
 $string['page:view:exclude.php:introduction'] = '<p>This page displays the configured exclusions.<br/>
 Exclusions are either users or cohorts that are completely excluded from any automated processing.<br/>
 When a cohort is excluded, this means every user that\'s a member of the cohort will be excluded.
