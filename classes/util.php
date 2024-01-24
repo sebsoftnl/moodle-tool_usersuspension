@@ -149,7 +149,7 @@ class util {
         if (!(bool)config::get('enablesmartdetect')) {
             return false;
         }
-        $lastrun = static::get_lastrun_config('smartdetect', 0, true);
+        $lastrun = static::get_lastrun_config('smartdetect', 0, false);
         $deltatime = time() - $lastrun;
         if ($deltatime < config::get('smartdetect_interval')) {
             return false;
@@ -176,11 +176,15 @@ class util {
         if (!(bool)config::get('enablesmartdetect')) {
             return false;
         }
+
+        // Always update lastrun if smartdetect is enabled. Lastrun is not updated in mark_users_to_suspend()
+        // so that the deltatime can be correctly calculated here.
+        $lastrun = static::get_lastrun_config('smartdetect', 0, true);
+
         if (!(bool)config::get('enablesmartdetect_warning')) {
             return false;
         }
         // Run in parallel with the suspensions.
-        $lastrun = static::get_lastrun_config('smartdetect', 0, true);
         $deltatime = time() - $lastrun;
         if ($deltatime < config::get('smartdetect_interval')) {
             return false;
