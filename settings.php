@@ -29,9 +29,7 @@
  * */
 defined('MOODLE_INTERNAL') || die('moodle_internal not defined');
 
-if ($hassiteconfig){
-    // We were extending the rights, so we can give the access to a specific role (=managers) without giving them full admin access.
-
+if ($hassiteconfig) {
     $temp = new admin_settingpage('suspensionsettings', new lang_string('suspensionsettings', 'tool_usersuspension'));
     // Header.
     $image = '<a href="http://www.sebsoft.nl" target="_new"><img src="' .
