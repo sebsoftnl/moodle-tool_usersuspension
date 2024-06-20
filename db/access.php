@@ -37,6 +37,13 @@ $capabilities = array(
             'manager' => CAP_ALLOW,
         )
     ),
+    'tool/usersuspension:manageraccess' => array(
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
+    ),
     'tool/usersuspension:viewstatus' => array(
         'captype' => 'view',
         'contextlevel' => CONTEXT_MODULE,

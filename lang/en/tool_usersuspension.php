@@ -269,6 +269,7 @@ $string['testing:unsuspendfromfolder'] = 'Testing configuration for "unsuspend f
 // Access strings.
 $string['usersuspension:administration'] = 'User suspension administration';
 $string['usersuspension:viewstatus'] = 'View user suspension status';
+$string['usersuspension:manageraccess'] = 'Allow managers to access the usersuspension tool backend, without full admin access';
 
 // Upload detection is deprecated; this is the new description.
 $string['setting:dep:uploaddetect_interval'] = 'Upload folder processing interval';

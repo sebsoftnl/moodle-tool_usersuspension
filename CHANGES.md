@@ -1,3 +1,8 @@
+Version 4.0.1 (build 2024062000)
+* New capability usersuspension:manageraccess to enable access for managers to backend, without site:config capability.
+
+----------
+
 Version 4.0.1 (build 2022090102)
 * Fix for set_config from projectbadger: Fixes lastrun config and smart detection.
 * Update to English strings from Nejc / AttackVectorDelta
