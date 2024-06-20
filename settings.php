@@ -29,7 +29,7 @@
  * */
 defined('MOODLE_INTERNAL') || die('moodle_internal not defined');
 
-if (($hassiteconfig) || (has_capability('tool/usersuspension:manageraccess', context_system::instance()))) {
+if ($hassiteconfig){
     // We were extending the rights, so we can give the access to a specific role (=managers) without giving them full admin access.
 
     $temp = new admin_settingpage('suspensionsettings', new lang_string('suspensionsettings', 'tool_usersuspension'));
@@ -177,6 +177,11 @@ if (($hassiteconfig) || (has_capability('tool/usersuspension:manageraccess', con
 
     $ADMIN->add('tools', $temp);
 
+    $ADMIN->add('accounts', new admin_externalpage('toolusersuspension', get_string('pluginname', 'tool_usersuspension'),
+        "{$CFG->wwwroot}/{$CFG->admin}/tool/usersuspension/view/exclude.php", 'moodle/user:update'
+    ));
+} else if (has_capability('tool/usersuspension:manageraccess', context_system::instance())) {
+    // We were extending the rights, so we can give the access to a specific role (=managers) without giving them full admin access.
     $ADMIN->add('accounts', new admin_externalpage('toolusersuspension', get_string('pluginname', 'tool_usersuspension'),
         "{$CFG->wwwroot}/{$CFG->admin}/tool/usersuspension/view/exclude.php", 'moodle/user:update'
     ));
