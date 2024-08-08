@@ -110,7 +110,7 @@ class util {
     public static function count_monitored_users() {
         global $DB;
 	$excludedDomains = static::get_excluded_domains_for_sql_not_in();
-	if ($excludedDomains === ""){
+	if (empty($excludedDomains)){
 		$where = 'deleted = :deleted';
 	}else{
 		$where = 'deleted = :deleted AND '. $excludedDomains;
@@ -477,7 +477,10 @@ class util {
         $where .= " OR (u.auth = 'manual' AND u.firstaccess = 0 AND u.lastaccess = 0 ";
         $where .= "     AND u.timemodified > 0 AND u.timemodified $detectoperator :{$uniqid}time3)";
         $where .= ")";
-        $where .= " AND " . $excludedDomains;
+        if (!empty($excludedDomains)){
+            $where .= " AND " . $excludedDomains;
+        }
+
         $params = array("{$uniqid}mnethost" => $CFG->mnet_localhost_id,
             "{$uniqid}time1" => $timecheck,
             "{$uniqid}time2" => $timecheck,
@@ -506,7 +509,10 @@ class util {
             "{$uniqid}" => time() - (int)config::get('cleanup_deleteafter'));
         $where = "u.suspended = 1 AND u.confirmed = 1 AND u.deleted = 0 "
                 . "AND u.mnethostid = :{$uniqid}mnethost AND u.timemodified $detectoperator :{$uniqid}";
-        $where .= " AND " . $excludedDomains;
+        if (!empty($excludedDomains)){
+            $where .= " AND " . $excludedDomains;
+        }
+
         static::append_user_exclusion($where, $params, 'u.');
         return array($where, $params);
     }
