@@ -57,6 +57,28 @@ class util {
         return 'pfx' . $counter;
     }
 
+
+    /**
+     * Get excluded domains for SQL NOT IN clause.
+     *
+     * @return string Excluded domains formatted for SQL NOT IN clause.
+     */
+    public static function get_excluded_domains_for_sql_not_in() {
+        global $DB;
+        $domainsToExcludeString = get_config('tool_usersuspension', 'domains_to_exclude');
+	    if (empty($domainsToExcludeString)) {
+		return "";
+	    }
+	    $domainsToExcludeArray = array_map('trim', explode(',', $domainsToExcludeString));
+	    $conditions = array_map(function($domain) use ($DB) {
+		$escapedDomain = $DB->sql_like_escape($domain);
+	        return "email NOT LIKE '%@$escapedDomain'";
+	    }, $domainsToExcludeArray);
+	    $notLikeClause = implode(' AND ', $conditions);
+	    return $notLikeClause;
+    }
+
+
     /**
      * Return a more humanly readable timespan string from a timespan
      *
@@ -87,7 +109,12 @@ class util {
      */
     public static function count_monitored_users() {
         global $DB;
-        $where = 'deleted = :deleted';
+	$excludedDomains = static::get_excluded_domains_for_sql_not_in();
+	if ($excludedDomains === ""){
+		$where = 'deleted = :deleted';
+	}else{
+		$where = 'deleted = :deleted AND '. $excludedDomains;
+	}
         $params = array('deleted' => 0);
         static::append_user_exclusion($where, $params, 'u.');
         return $DB->count_records_sql('SELECT COUNT(*) FROM {user} u WHERE ' . $where, $params);
@@ -439,6 +466,7 @@ class util {
      */
     public static function get_suspension_query($pastsuspensiondate = true, $customtime = null) {
         global $CFG;
+        $excludedDomains = static::get_excluded_domains_for_sql_not_in();
         $uniqid = static::get_prefix();
         $detectoperator = $pastsuspensiondate ? '<' : '>';
         $timecheck = !empty($customtime) ? $customtime : time() - (config::get('smartdetect_suspendafter'));
@@ -449,6 +477,7 @@ class util {
         $where .= " OR (u.auth = 'manual' AND u.firstaccess = 0 AND u.lastaccess = 0 ";
         $where .= "     AND u.timemodified > 0 AND u.timemodified $detectoperator :{$uniqid}time3)";
         $where .= ")";
+        $where .= " AND " . $excludedDomains;
         $params = array("{$uniqid}mnethost" => $CFG->mnet_localhost_id,
             "{$uniqid}time1" => $timecheck,
             "{$uniqid}time2" => $timecheck,
@@ -470,12 +499,14 @@ class util {
      */
     public static function get_deletion_query($pastdeletiondate = true) {
         global $CFG;
+        $excludedDomains = static::get_excluded_domains_for_sql_not_in();
         $detectoperator = $pastdeletiondate ? '<' : '>';
         $uniqid = static::get_prefix();
         $params = array("{$uniqid}mnethost" => $CFG->mnet_localhost_id,
             "{$uniqid}" => time() - (int)config::get('cleanup_deleteafter'));
         $where = "u.suspended = 1 AND u.confirmed = 1 AND u.deleted = 0 "
                 . "AND u.mnethostid = :{$uniqid}mnethost AND u.timemodified $detectoperator :{$uniqid}";
+        $where .= " AND " . $excludedDomains;
         static::append_user_exclusion($where, $params, 'u.');
         return array($where, $params);
     }

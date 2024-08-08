@@ -64,6 +64,11 @@ if ($hassiteconfig) {
             get_string('setting:desc:sendsuspendemail', 'tool_usersuspension'),
             '0', '1', '0'));
 
+    $temp->add(new admin_setting_configtext('tool_usersuspension/domains_to_exclude',
+            get_string('setting:domainstoexclude', 'tool_usersuspension'),
+            get_string('setting:desc:domainstoexclude', 'tool_usersuspension'),
+            'myowndomain.org'));
+
     // FTP settings.
     $temp->add(new admin_setting_heading('tool_usersuspension_suspensionsettingsfolder',
             get_string('suspensionsettingsfolder', 'tool_usersuspension'),

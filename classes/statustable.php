@@ -188,9 +188,11 @@ class statustable extends \table_sql {
      */
     protected function render_statusses($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'lastlogin', 'timemodified');
+        $excludedDomains = \tool_usersuspension\util::get_excluded_domains_for_sql_not_in();
+        $cols = array('username', 'email', 'name', 'lastlogin', 'timemodified');
         $headers = array(
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:lastlogin', 'tool_usersuspension'),
             get_string('thead:timemodified', 'tool_usersuspension'));
@@ -203,9 +205,13 @@ class statustable extends \table_sql {
         $this->define_columns($cols);
         $this->define_headers($headers);
 
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.timemodified,u.suspended,u.deleted,NULL AS action';
-        $where = 'deleted = :deleted';
+        if ($excludedDomains === ""){
+                $where = 'deleted = :deleted';
+        }else{
+                $where = 'deleted = :deleted AND '. $excludedDomains;
+        }
         $params = array('deleted' => 0);
         $this->add_exclude_users($where, $params);
 
@@ -228,9 +234,10 @@ class statustable extends \table_sql {
      */
     protected function render_suspended($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'lastlogin', 'timemodified');
+        $cols = array('username', 'email', 'name', 'lastlogin', 'timemodified');
         $headers = array(
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:lastlogin', 'tool_usersuspension'),
             get_string('thead:timemodified', 'tool_usersuspension'));
@@ -243,7 +250,7 @@ class statustable extends \table_sql {
         $this->define_columns($cols);
         $this->define_headers($headers);
 
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.timemodified,u.suspended,u.deleted,NULL AS action';
         $where = 'suspended = :suspended AND deleted = :deleted';
         $params = array('suspended' => 1, 'deleted' => 0);
@@ -269,9 +276,10 @@ class statustable extends \table_sql {
      */
     protected function render_to_suspend($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'timedetect', 'suspendin');
+        $cols = array('username', 'email', 'name', 'timedetect', 'suspendin');
         $headers = array(
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:timedetect', 'tool_usersuspension'),
             get_string('thead:suspendin', 'tool_usersuspension'));
@@ -298,7 +306,7 @@ class statustable extends \table_sql {
                 ' - (:now - '.$sqlpartgreatest.')) AS suspendin,';
         $suspendonsql = '(' . $sqlpartgreatest . ' + ' .
                 config::get('smartdetect_suspendafter') . ') as suspendon,';
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,' .
                 $sqlpartgreatest . ' AS timedetect,'.
                 $suspendinsql.
@@ -330,9 +338,10 @@ class statustable extends \table_sql {
      */
     protected function render_to_delete($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'timedetect', 'deletein');
+        $cols = array('username', 'email', 'name', 'timedetect', 'deletein');
         $headers = array(
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:timedetect', 'tool_usersuspension'),
             get_string('thead:deletein', 'tool_usersuspension'));
@@ -359,7 +368,7 @@ class statustable extends \table_sql {
                 ' - (:now - u.timemodified)) AS deletein,';
         $deleteonsql = '(' . $sqlpartgreatest . ' + ' .
                 config::get('cleanup_deleteafter') . ') as deleteon,';
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,'.
                 $sqlpartgreatest . ' AS timedetect,'.
                 $deleteinsql.
