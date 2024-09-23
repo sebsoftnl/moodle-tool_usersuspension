@@ -15,31 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Callback point for tool usersuspension
+ * Tasks performed by tool usersuspension
+ *
+ * File         tasks.php
+ * Encoding     UTF-8
  *
  * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
+ *
+ * */
+defined('MOODLE_INTERNAL') || die();
 
-/**
- * Execute/inject code before sending HTTP headers.
- */
-function tool_usersuspension_before_http_headers() {
-    global $SESSION;
-
-    if (!isloggedin() || isguestuser()) {
-        return;
-    }
-
-    if (!empty($SESSION->warncheck)) {
-        return;
-    }
-
-    if (get_user_preferences('tool_usersuspension_warned', false)) {
-        unset_user_preference('tool_usersuspension_warned');
-    }
-
-    $SESSION->warncheck = true;
-}
+$callbacks = [
+    [
+        'hook' => \core\hook\output\before_http_headers::class,
+        'callback' => [\tool_usersuspension\hook_callbacks::class, 'before_http_headers'],
+    ],
+];
