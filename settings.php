@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  *
  * */
@@ -63,6 +63,11 @@ if ($hassiteconfig) {
             get_string('setting:sendsuspendemail', 'tool_usersuspension'),
             get_string('setting:desc:sendsuspendemail', 'tool_usersuspension'),
             '0', '1', '0'));
+
+    $temp->add(new admin_setting_configtext('tool_usersuspension/domains_to_exclude',
+            get_string('setting:domainstoexclude', 'tool_usersuspension'),
+            get_string('setting:desc:domainstoexclude', 'tool_usersuspension'),
+            ''));
 
     // FTP settings.
     $temp->add(new admin_setting_heading('tool_usersuspension_suspensionsettingsfolder',

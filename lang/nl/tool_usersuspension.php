@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'Gebruikersschorsing';
@@ -75,7 +75,7 @@ $string['setting:smartdetect_interval'] = 'Interval voor slimme detectie';
 $string['setting:desc:smartdetect_interval'] = 'Stel interval in hoe vaak slimme detectie draait';
 $string['setting:smartdetect_suspendafter'] = 'Schorsingsinterval';
 $string['setting:desc:smartdetect_suspendafter'] = 'Stel interval in waarop gebruikers als inactief worden aangemerkt en automatisch worden geschorst';
-$string['setting:enablesmartdetectwarning'] = 'E0mails verzenden tbv schorsing??';
+$string['setting:enablesmartdetectwarning'] = 'E-mails verzenden tbv schorsing??';
 $string['setting:desc:enablesmartdetectwarning'] = 'Indien ingeschakeld wordt een email verstuurd naar de eindgebruiker dat het account binnenkort wordt geschorst.';
 $string['setting:smartdetect_warninginterval'] = 'Waarschuwingsperiode';
 $string['setting:desc:smartdetect_warninginterval'] = 'Zet de tijd voor schorsing voordat een eindgebruiker een email zal krijgen over de op hand zijnde schorsing van diens account.';
@@ -111,7 +111,7 @@ $string['page:view:log.php:introduction'] = 'De tabel hieronder toont het histor
 resultaat van (automatische) verwerking binnen deze plugin. Het toont, afhankelijk van de instellingen, de schorsingsstatus of verwijderingsstatus van
 de moodle accounts en het moment waarop deze statussen zijn toegewezen.';
 $string['page:view:exclude.php:introduction'] = '<p>Deze pagina toont de geconfigureerde uitsluitingen.<br/>
-Uitsluitingen zijn ofwel sitegorpen ofwel gebruikers die volledig zijn uitgesloten van automatische verwerking door deze plugin.<br/>
+Uitsluitingen zijn ofwel sitegroepen ofwel gebruikers die volledig zijn uitgesloten van automatische verwerking door deze plugin.<br/>
 Wanneer een sitegroep is uitgesloten, betekent dit dat geen enkele gebruiker uit de sitegroep wordt verwerkt.
 Gebruik de opties op deze pagina om uitsluitingen te configureren.</p>';
 $string['config:tool:disabled'] = 'Gebruikersschorsing plugin is uitgezet via de globale blokinstellingen';

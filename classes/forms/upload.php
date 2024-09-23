@@ -19,6 +19,9 @@
  *
  * File         upload.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +38,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class upload extends \moodleform {
@@ -57,22 +60,22 @@ class upload extends \moodleform {
                 get_string('form:static:uploadfile:desc', 'tool_usersuspension') . $link);
         $maxbytes = 1048576; // 1 MB.
         $mform->addElement('filepicker', 'userfile', get_string('file'), null,
-                array('maxbytes' => $maxbytes, 'accepted_types' => array('.csv')));
+                ['maxbytes' => $maxbytes, 'accepted_types' => ['.csv']]);
 
-        $delims = array(';' => ';', '|' => '|', ',' => ',');
+        $delims = [';' => ';', '|' => '|', ',' => ','];
         $select1 = $mform->addElement('select', 'delimiter', get_string('csv:delimiter', 'tool_usersuspension'), $delims);
         $mform->setType('delimiter', PARAM_TEXT);
         $select1->setSelected(';');
 
-        $enclosures = array('"' => '"', "'" => "'");
+        $enclosures = ['"' => '"', "'" => "'"];
         $select2 = $mform->addElement('select', 'enclosure', get_string('csv:enclosure', 'tool_usersuspension'), $enclosures);
         $mform->setType('enclosure', PARAM_TEXT);
         $select2->setSelected('"');
 
-        $options = array(
+        $options = [
             \tool_usersuspension\processor\csv::MODE_SUSPEND => get_string('suspend', 'tool_usersuspension'),
             \tool_usersuspension\processor\csv::MODE_UNSUSPEND => get_string('unsuspend', 'tool_usersuspension'),
-        );
+        ];
         $mform->addElement('select', 'suspendmode', get_string('suspendmode', 'tool_usersuspension'), $options);
         $mform->setType('suspendmode', PARAM_INT);
         $mform->setDefault('suspendmode', \tool_usersuspension\processor\csv::MODE_SUSPEND);

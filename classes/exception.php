@@ -19,6 +19,9 @@
  *
  * File         exception.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,7 +34,7 @@ namespace tool_usersuspension;
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class exception extends \moodle_exception {

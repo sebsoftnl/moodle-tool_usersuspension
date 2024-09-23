@@ -19,6 +19,9 @@
  *
  * File         statustable_filter.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -41,7 +44,7 @@ require_once($CFG->dirroot . '/user/filters/lib.php');
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class statustable_filtering extends user_filtering {
@@ -84,19 +87,20 @@ class statustable_filtering extends user_filtering {
 
         $filterid = $this->get_filter_id();
         if (!isset($SESSION->{$filterid})) {
-            $SESSION->{$filterid} = array();
+            $SESSION->{$filterid} = [];
         }
 
         if (empty($fieldnames)) {
-            $fieldnames = array('realname' => 0, 'lastname' => 1, 'firstname' => 1,
+            $fieldnames = ['realname' => 0, 'lastname' => 1, 'firstname' => 1,
                 'username' => 1, 'email' => 1, 'city' => 1, 'country' => 1,
                 'confirmed' => 1, 'suspended' => 1, 'profile' => 1, 'courserole' => 1,
                 'anycourses' => 1, 'systemrole' => 1, 'cohort' => 1, 'firstaccess' => 1,
                 'lastaccess' => 1, 'neveraccessed' => 1, 'timemodified' => 1,
-                'nevermodified' => 1, 'auth' => 1, 'mnethostid' => 1, 'idnumber' => 1);
+                'nevermodified' => 1, 'auth' => 1, 'mnethostid' => 1, 'idnumber' => 1,
+            ];
         }
 
-        $this->_fields  = array();
+        $this->_fields  = [];
 
         foreach ($fieldnames as $fieldname => $advanced) {
             if ($field = $this->get_field($fieldname, $advanced)) {
@@ -105,8 +109,8 @@ class statustable_filtering extends user_filtering {
         }
 
         // Fist the new filter form.
-        $this->_addform = new user_add_filter_form($baseurl, array('fields' => $this->_fields,
-            'extraparams' => $extraparams));
+        $this->_addform = new user_add_filter_form($baseurl, ['fields' => $this->_fields,
+            'extraparams' => $extraparams]);
         if ($adddata = $this->_addform->get_data()) {
             foreach ($this->_fields as $fname => $field) {
                 $data = $field->check_data($adddata);
@@ -114,22 +118,22 @@ class statustable_filtering extends user_filtering {
                     continue; // Nothing new.
                 }
                 if (!array_key_exists($fname, $SESSION->{$filterid})) {
-                    $SESSION->{$filterid}[$fname] = array();
+                    $SESSION->{$filterid}[$fname] = [];
                 }
                 $SESSION->{$filterid}[$fname][] = $data;
             }
             // Clear the form.
-            $_POST = array();
-            $this->_addform = new user_add_filter_form($baseurl, array('fields' => $this->_fields,
-                'extraparams' => $extraparams));
+            $_POST = [];
+            $this->_addform = new user_add_filter_form($baseurl, ['fields' => $this->_fields,
+                'extraparams' => $extraparams]);
         }
 
         // Now the active filters.
-        $this->_activeform = new active_filter_form($baseurl, array('fields' => $this->_fields,
-            'extraparams' => $extraparams, 'filterid' => $filterid));
+        $this->_activeform = new active_filter_form($baseurl, ['fields' => $this->_fields,
+            'extraparams' => $extraparams, 'filterid' => $filterid]);
         if ($adddata = $this->_activeform->get_data()) {
             if (!empty($adddata->removeall)) {
-                $SESSION->{$filterid} = array();
+                $SESSION->{$filterid} = [];
 
             } else if (!empty($adddata->removeselected) && !empty($adddata->filter)) {
                 foreach ($adddata->filter as $fname => $instances) {
@@ -145,9 +149,9 @@ class statustable_filtering extends user_filtering {
                 }
             }
             // Clear+reload the form.
-            $_POST = array();
-            $this->_activeform = new active_filter_form($baseurl, array('fields' => $this->_fields,
-                'extraparams' => $extraparams, 'filterid' => $filterid));
+            $_POST = [];
+            $this->_activeform = new active_filter_form($baseurl, ['fields' => $this->_fields,
+                'extraparams' => $extraparams, 'filterid' => $filterid]);
         }
         // Now the active filters.
     }
@@ -203,7 +207,7 @@ class statustable_filtering extends user_filtering {
         global $SESSION;
         $filterid = $this->get_filter_id();
 
-        $sqls = array();
+        $sqls = [];
         if ($extra != '') {
             $sqls[] = $extra;
         }
@@ -224,10 +228,10 @@ class statustable_filtering extends user_filtering {
         }
 
         if (empty($sqls)) {
-            return array('', array());
+            return ['', []];
         } else {
             $sqls = implode(' AND ', $sqls);
-            return array($sqls, $params);
+            return [$sqls, $params];
         }
     }
 
@@ -244,7 +248,7 @@ class statustable_filtering extends user_filtering {
  * @category    admin
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class active_filter_form extends moodleform {
@@ -282,7 +286,7 @@ class active_filter_form extends moodleform {
                 }
             }
 
-            $objs = array();
+            $objs = [];
             $objs[] = &$mform->createElement('submit', 'removeselected', get_string('removeselected', 'filters'));
             $objs[] = &$mform->createElement('submit', 'removeall', get_string('removeall', 'filters'));
             $mform->addElement('group', 'actfiltergrp', '', $objs, ' ', false);

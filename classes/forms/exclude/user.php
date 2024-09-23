@@ -19,6 +19,9 @@
  *
  * File         user.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +38,7 @@ require_once($CFG->libdir . '/formslib.php');
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user extends \moodleform {
@@ -57,7 +60,7 @@ class user extends \moodleform {
     public function definition() {
         global $OUTPUT;
         // Create the user selector objects.
-        $options = array('accesscontext' => \context_system::instance());
+        $options = ['accesscontext' => \context_system::instance()];
         $this->currentuserselector = new \tool_usersuspension\exclude\user\selector\current('removeselect', $options);
         $this->potentialuserselector = new \tool_usersuspension\exclude\user\selector\potential('addselect', $options);
         $mform = $this->_form;
@@ -103,7 +106,7 @@ class user extends \moodleform {
             $userstoremove = $this->currentuserselector->get_selected_users();
             if (!empty($userstoremove)) {
                 foreach ($userstoremove as $removeuser) {
-                    $obj = array('type' => 'user', 'refid' => $removeuser->id);
+                    $obj = ['type' => 'user', 'refid' => $removeuser->id];
                     if ($DB->record_exists('tool_usersuspension_excl', $obj)) {
                         $DB->delete_records('tool_usersuspension_excl', $obj);
                         $removeuser->fullname = fullname($removeuser);
@@ -117,7 +120,7 @@ class user extends \moodleform {
             $userstoexclude = $this->potentialuserselector->get_selected_users();
             if (!empty($userstoexclude)) {
                 foreach ($userstoexclude as $adduser) {
-                    $obj = array('type' => 'user', 'refid' => $adduser->id);
+                    $obj = ['type' => 'user', 'refid' => $adduser->id];
                     if (!$DB->record_exists('tool_usersuspension_excl', $obj)) {
                         $obj['timecreated'] = time();
                         $DB->insert_record('tool_usersuspension_excl', (object)$obj);

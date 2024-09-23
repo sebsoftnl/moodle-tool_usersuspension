@@ -19,6 +19,9 @@
  *
  * File         logtable.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,7 +37,7 @@ require_once($CFG->libdir . '/tablelib.php');
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class logtable extends \table_sql {
@@ -105,16 +108,16 @@ class logtable extends \table_sql {
      */
     public function render_log($pagesize, $useinitialsbar = true) {
         global $DB;
-        $this->define_columns(array('userid', 'name', 'status', 'mailsent', 'mailedto', 'timecreated', 'action'));
-        $this->define_headers(array(
+        $this->define_columns(['userid', 'name', 'status', 'mailsent', 'mailedto', 'timecreated', 'action']);
+        $this->define_headers([
             get_string('thead:userid', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:status', 'tool_usersuspension'),
             get_string('thead:mailsent', 'tool_usersuspension'),
             get_string('thead:mailedto', 'tool_usersuspension'),
             get_string('thead:timecreated', 'tool_usersuspension'),
-            get_string('thead:action', 'tool_usersuspension'))
-        );
+            get_string('thead:action', 'tool_usersuspension'),
+        ]);
         $fields = 'l.id,l.userid,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,l.status,l.mailsent,l.mailedto,l.timecreated,NULL AS action';
         $table = ($this->showhistory ? 'tool_usersuspension_log' : 'tool_usersuspension_status');
@@ -153,7 +156,7 @@ class logtable extends \table_sql {
      * @return string actions
      */
     public function col_action($row) {
-        $actions = array();
+        $actions = [];
         return implode('', $actions);
     }
 
@@ -178,7 +181,7 @@ class logtable extends \table_sql {
     protected function get_action($row, $action) {
         $actionstr = 'str' . $action;
         return '<a href="' . new \moodle_url($this->baseurl,
-                array('action' => $action, 'id' => $row->id, 'sesskey' => sesskey())) .
+                ['action' => $action, 'id' => $row->id, 'sesskey' => sesskey()]) .
                 '" alt="' . $this->{$actionstr} .
                 '">' . $this->get_action_image($action) . '</a>';
     }

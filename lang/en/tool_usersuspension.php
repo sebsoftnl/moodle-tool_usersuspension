@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['pluginname'] = 'User Suspension';
@@ -92,6 +92,8 @@ $string['setting:cleanup_deleteafter'] = 'Deletion interval';
 $string['setting:desc:cleanup_deleteafter'] = 'Sets how long after their suspension users should automatically get deleted';
 $string['setting:sendsuspendemail'] = 'Send suspension email?';
 $string['setting:desc:sendsuspendemail'] = 'Send out an e-mail informing the user about their account being suspended?';
+$string['setting:domainstoexclude'] = 'Domains to exclude';
+$string['setting:desc:domainstoexclude'] = 'List of domains to exclude from suspend and deletion, separated by comma';
 $string['setting:senddeleteemail'] = 'Send delete email?';
 $string['setting:desc:senddeleteemail'] = 'Send out an e-mail informing the user about their account being deleted?';
 $string['csv:delimiter'] = 'Delimiter';
@@ -219,6 +221,7 @@ $string['thead:status'] = 'Status';
 $string['thead:mailsent'] = 'E-mail sent';
 $string['thead:mailedto'] = 'E-mailed to';
 $string['thead:username'] = 'Username';
+$string['thead:email'] = 'E-mail';
 $string['thead:lastlogin'] = 'Last login';
 $string['thead:timemodified'] = 'Time modified';
 $string['thead:deletein'] = 'Delete in';

@@ -19,6 +19,9 @@
  *
  * File         util.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +38,7 @@ require_once($CFG->dirroot . '/user/filters/lib.php');
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class statustable extends \table_sql {
@@ -132,12 +135,12 @@ class statustable extends \table_sql {
      * @return array list of view types
      */
     public static function get_viewtypes() {
-        return array(
+        return [
             self::STATUS,
             self::SUSPENDED,
             self::TOSUSPEND,
             self::DELETE,
-        );
+        ];
     }
 
     /**
@@ -188,12 +191,15 @@ class statustable extends \table_sql {
      */
     protected function render_statusses($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'lastlogin', 'timemodified');
-        $headers = array(
+        $excludeddomains = \tool_usersuspension\util::get_excluded_domains_for_sql_not_in();
+        $cols = ['username', 'email', 'name', 'lastlogin', 'timemodified'];
+        $headers = [
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:lastlogin', 'tool_usersuspension'),
-            get_string('thead:timemodified', 'tool_usersuspension'));
+            get_string('thead:timemodified', 'tool_usersuspension'),
+        ];
 
         if (!$this->is_downloading()) {
             $cols[] = 'action';
@@ -203,10 +209,13 @@ class statustable extends \table_sql {
         $this->define_columns($cols);
         $this->define_headers($headers);
 
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.timemodified,u.suspended,u.deleted,NULL AS action';
         $where = 'deleted = :deleted';
-        $params = array('deleted' => 0);
+        $params = ['deleted' => 0];
+        if (!empty($excludeddomains)) {
+            $where .= ' AND ' . $excludeddomains;
+        }
         $this->add_exclude_users($where, $params);
 
         // And apply filter(s).
@@ -228,12 +237,14 @@ class statustable extends \table_sql {
      */
     protected function render_suspended($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'lastlogin', 'timemodified');
-        $headers = array(
+        $cols = ['username', 'email', 'name', 'lastlogin', 'timemodified'];
+        $headers = [
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:lastlogin', 'tool_usersuspension'),
-            get_string('thead:timemodified', 'tool_usersuspension'));
+            get_string('thead:timemodified', 'tool_usersuspension'),
+        ];
 
         if (!$this->is_downloading()) {
             $cols[] = 'action';
@@ -243,10 +254,10 @@ class statustable extends \table_sql {
         $this->define_columns($cols);
         $this->define_headers($headers);
 
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.timemodified,u.suspended,u.deleted,NULL AS action';
         $where = 'suspended = :suspended AND deleted = :deleted';
-        $params = array('suspended' => 1, 'deleted' => 0);
+        $params = ['suspended' => 1, 'deleted' => 0];
         $this->add_exclude_users($where, $params);
 
         // And apply filter(s).
@@ -269,12 +280,14 @@ class statustable extends \table_sql {
      */
     protected function render_to_suspend($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'timedetect', 'suspendin');
-        $headers = array(
+        $cols = ['username', 'email', 'name', 'timedetect', 'suspendin'];
+        $headers = [
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:timedetect', 'tool_usersuspension'),
-            get_string('thead:suspendin', 'tool_usersuspension'));
+            get_string('thead:suspendin', 'tool_usersuspension'),
+        ];
 
         if (!$this->is_downloading()) {
             $cols[] = 'action';
@@ -298,7 +311,7 @@ class statustable extends \table_sql {
                 ' - (:now - '.$sqlpartgreatest.')) AS suspendin,';
         $suspendonsql = '(' . $sqlpartgreatest . ' + ' .
                 config::get('smartdetect_suspendafter') . ') as suspendon,';
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,' .
                 $sqlpartgreatest . ' AS timedetect,'.
                 $suspendinsql.
@@ -330,12 +343,14 @@ class statustable extends \table_sql {
      */
     protected function render_to_delete($pagesize, $useinitialsbar = true) {
         global $DB;
-        $cols = array('username', 'name', 'timedetect', 'deletein');
-        $headers = array(
+        $cols = ['username', 'email', 'name', 'timedetect', 'deletein'];
+        $headers = [
             get_string('thead:username', 'tool_usersuspension'),
+            get_string('thead:email', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:timedetect', 'tool_usersuspension'),
-            get_string('thead:deletein', 'tool_usersuspension'));
+            get_string('thead:deletein', 'tool_usersuspension'),
+        ];
 
         if (!$this->is_downloading()) {
             $cols[] = 'action';
@@ -359,7 +374,7 @@ class statustable extends \table_sql {
                 ' - (:now - u.timemodified)) AS deletein,';
         $deleteonsql = '(' . $sqlpartgreatest . ' + ' .
                 config::get('cleanup_deleteafter') . ') as deleteon,';
-        $fields = 'u.id,u.username,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
+        $fields = 'u.id,u.username,u.email,' . $DB->sql_fullname('u.firstname', 'u.lastname') .
                 ' AS name,u.lastlogin,u.firstaccess,u.lastaccess,u.timemodified,u.suspended,u.deleted,'.
                 $sqlpartgreatest . ' AS timedetect,'.
                 $deleteinsql.
@@ -408,7 +423,7 @@ class statustable extends \table_sql {
         if ($this->is_downloading()) {
             return $row->username;
         }
-        $link = new \moodle_url($CFG->wwwroot . '/user/profile.php', array('id' => $row->id));
+        $link = new \moodle_url($CFG->wwwroot . '/user/profile.php', ['id' => $row->id]);
         return '<a href="' . $link->out() . '">' . $row->username . '</a>';
     }
 
@@ -469,7 +484,7 @@ class statustable extends \table_sql {
      * @return string actions
      */
     public function col_action($row) {
-        $actions = array();
+        $actions = [];
         if ($this->capuserupdate) {
             if ($row->suspended == 1 && ($this->displaytype == self::DELETE || $this->displaytype == self::SUSPENDED)) {
                 $actions[] = $this->get_action($row, 'unsuspend');
@@ -506,9 +521,8 @@ class statustable extends \table_sql {
      */
     protected function get_action($row, $action) {
         $actionstr = 'str' . $action;
-        return '<a href="' . new \moodle_url($this->baseurl,
-                array('action' => $action, 'id' => $row->id,
-                    'sesskey' => sesskey(), 'type' => $this->displaytype)) .
+        return '<a href="' . new \moodle_url($this->baseurl, ['action' => $action,
+            'id' => $row->id, 'sesskey' => sesskey(), 'type' => $this->displaytype]) .
                 '" alt="' . $this->{$actionstr} .
                 '">' . $this->get_action_image($action) . '</a>';
     }

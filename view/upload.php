@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -42,7 +42,7 @@ if (!(bool)\tool_usersuspension\config::get('enablefromupload')) {
     echo $OUTPUT->header();
     echo '<div id="tool-usersuspension-container">';
     echo '<div>';
-    \tool_usersuspension\util::print_view_tabs(array(), 'upload');
+    \tool_usersuspension\util::print_view_tabs([], 'upload');
     echo '</div>';
     echo '<div class="tool-usersuspension-warning">' . get_string('config:tool:disabled', 'tool_usersuspension') . '</div>';
     echo '</div>';
@@ -64,7 +64,7 @@ if (!(bool)\tool_usersuspension\config::get('enablefromupload')) {
         echo $OUTPUT->header();
         echo '<div id="tool-usersuspension-form-container">';
         echo '<div>';
-        \tool_usersuspension\util::print_view_tabs(array(), 'upload');
+        \tool_usersuspension\util::print_view_tabs([], 'upload');
         echo '</div>';
         echo $mform->display();
         echo '</div>';

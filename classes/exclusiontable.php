@@ -19,6 +19,9 @@
  *
  * File         exclusiontable.php
  * Encoding     UTF-8
+ *
+ * @package     tool_usersuspension
+ *
  * @copyright   Sebsoft.nl
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,7 +37,7 @@ require_once($CFG->libdir . '/tablelib.php');
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class exclusiontable extends \flexible_table {
@@ -63,7 +66,7 @@ class exclusiontable extends \flexible_table {
     public function __construct() {
         global $USER;
         parent::__construct(__CLASS__. '-' . $USER->id . '-' . $this->tabletype);
-        $this->rawdata = array();
+        $this->rawdata = [];
         $this->strdelete = get_string('action:delete-exclusion', 'tool_usersuspension');
         $this->no_sorting('action');
     }
@@ -75,13 +78,13 @@ class exclusiontable extends \flexible_table {
      * @param bool $useinitialsbar
      */
     public function render($pagesize, $useinitialsbar = true) {
-        $this->define_columns(array('type', 'name', 'timecreated', 'action'));
-        $this->define_headers(array(
+        $this->define_columns(['type', 'name', 'timecreated', 'action']);
+        $this->define_headers([
             get_string('thead:type', 'tool_usersuspension'),
             get_string('thead:name', 'tool_usersuspension'),
             get_string('thead:timecreated', 'tool_usersuspension'),
-            get_string('thead:action', 'tool_usersuspension'))
-        );
+            get_string('thead:action', 'tool_usersuspension'),
+        ]);
 
         $this->setup();
 
@@ -139,7 +142,7 @@ class exclusiontable extends \flexible_table {
         $from = '{tool_usersuspension_excl} e JOIN {user} u ON e.refid=u.id';
         $where = "type = :{$pfx}type";
         $sql = "SELECT $fields FROM $from WHERE $where";
-        return array($sql, array("{$pfx}type" => 'user'));
+        return [$sql, ["{$pfx}type" => 'user']];
     }
 
     /**
@@ -149,7 +152,7 @@ class exclusiontable extends \flexible_table {
     protected function load_type_users($pagesize) {
         global $DB;
         // Table size.
-        $count = $DB->count_records('tool_usersuspension_excl', array('type' => 'user'));
+        $count = $DB->count_records('tool_usersuspension_excl', ['type' => 'user']);
         $this->pagesize($pagesize, $count);
 
         list($sql, $params) = $this->get_type_users_sql();
@@ -172,7 +175,7 @@ class exclusiontable extends \flexible_table {
         $from = '{tool_usersuspension_excl} e JOIN {cohort} c ON e.refid=c.id';
         $where = "type = :{$pfx}type";
         $sql = "SELECT $fields FROM $from WHERE $where";
-        return array($sql, array("{$pfx}type" => 'cohort'));
+        return [$sql, ["{$pfx}type" => 'cohort']];
     }
 
     /**
@@ -182,7 +185,7 @@ class exclusiontable extends \flexible_table {
     protected function load_type_cohorts($pagesize) {
         global $DB;
         // Table size.
-        $count = $DB->count_records('tool_usersuspension_excl', array('type' => 'user'));
+        $count = $DB->count_records('tool_usersuspension_excl', ['type' => 'user']);
         $this->pagesize($pagesize, $count);
 
         list($sql, $params) = $this->get_type_cohorts_sql();
@@ -228,7 +231,7 @@ class exclusiontable extends \flexible_table {
     public function col_name($row) {
         global $CFG;
         if ($row->type === 'user') {
-            $link = new \moodle_url($CFG->wwwroot . '/user/profile.php', array('id' => $row->id));
+            $link = new \moodle_url($CFG->wwwroot . '/user/profile.php', ['id' => $row->id]);
             return '<a href="' . $link->out() . '">' . $row->name . '</a>';
         } else {
             $link = new \moodle_url($CFG->wwwroot . '/cohort/index.php');
@@ -253,7 +256,7 @@ class exclusiontable extends \flexible_table {
      * @return string actions
      */
     public function col_action($row) {
-        $actions = array();
+        $actions = [];
         $actions[] = $this->get_action($row, 'delete', true);
         return implode('', $actions);
     }
@@ -288,7 +291,7 @@ class exclusiontable extends \flexible_table {
                     '\');"';
         }
         return '<a ' . $onclick . 'href="' . new \moodle_url($this->baseurl,
-                array('action' => $action, 'id' => $row->id, 'sesskey' => sesskey())) .
+                ['action' => $action, 'id' => $row->id, 'sesskey' => sesskey()]) .
                 '" alt="' . $this->{$actionstr} .
                 '">' . $this->get_action_image($action) . '</a>';
     }

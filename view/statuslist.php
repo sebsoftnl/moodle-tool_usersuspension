@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -38,7 +38,7 @@ admin_externalpage_setup('toolusersuspension');
 $context       = \context_system::instance();
 
 $viewtype = optional_param('type', \tool_usersuspension\statustable::STATUS, PARAM_ALPHA);
-$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/statuslist.php', array('type' => $viewtype));
+$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/statuslist.php', ['type' => $viewtype]);
 require_capability('tool/usersuspension:viewstatus', $context);
 
 // Process action?
@@ -46,7 +46,7 @@ $action = optional_param('action', null, PARAM_ALPHA);
 if ($action === 'exclude') {
     require_sesskey();
     $id = required_param('id', PARAM_INT);
-    $obj = array('type' => 'user', 'refid' => $id);
+    $obj = ['type' => 'user', 'refid' => $id];
     if (!$DB->record_exists('tool_usersuspension_excl', $obj)) {
         $obj['timecreated'] = time();
         $DB->insert_record('tool_usersuspension_excl', (object)$obj);
@@ -59,7 +59,7 @@ if ($action === 'exclude') {
     require_sesskey();
     require_capability('moodle/user:update', context_system::instance());
     $id = required_param('id', PARAM_INT);
-    $user = $DB->get_record('user', array('id' => $id));
+    $user = $DB->get_record('user', ['id' => $id]);
     $result = \tool_usersuspension\util::do_suspend_user($user, false);
     if ($result === true) {
         $message = get_string('msg:user:suspend:success', 'tool_usersuspension', $user);
@@ -71,7 +71,7 @@ if ($action === 'exclude') {
     require_sesskey();
     require_capability('moodle/user:update', context_system::instance());
     $id = required_param('id', PARAM_INT);
-    $user = $DB->get_record('user', array('id' => $id));
+    $user = $DB->get_record('user', ['id' => $id]);
     $result = \tool_usersuspension\util::do_unsuspend_user($user);
     if ($result === true) {
         $message = get_string('msg:user:unsuspend:success', 'tool_usersuspension', $user);
@@ -119,7 +119,7 @@ if ($action === 'exclude') {
     echo $OUTPUT->header();
     echo '<div class="tool-usersuspension-container">';
     echo '<div>';
-    \tool_usersuspension\util::print_view_tabs(array(), $viewtype);
+    \tool_usersuspension\util::print_view_tabs([], $viewtype);
     echo '</div>';
     echo '<div>' . get_string('page:view:statuslist.php:introduction:' . $viewtype, 'tool_usersuspension') . '</div>';
     echo '<div>';

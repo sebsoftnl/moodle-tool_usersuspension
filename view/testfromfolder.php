@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -57,7 +57,7 @@ function write_actiontype_links($pageurl) {
 admin_externalpage_setup('toolusersuspension');
 $context       = \context_system::instance();
 
-$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/testfromfolder.php', array());
+$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/testfromfolder.php', []);
 
 require_capability('tool/usersuspension:administration', $context);
 
@@ -68,7 +68,7 @@ if (!in_array($actiontype, $actiontypes)) {
     echo $OUTPUT->header();
     echo '<div class="tool-usersuspension-container">';
     echo '<div>';
-    \tool_usersuspension\util::print_view_tabs(array(), 'testfromfolder');
+    \tool_usersuspension\util::print_view_tabs([], 'testfromfolder');
     echo '</div>';
     write_actiontype_links($thispageurl);
     echo '</div>';
@@ -77,7 +77,7 @@ if (!in_array($actiontype, $actiontypes)) {
     echo $OUTPUT->header();
     echo '<div class="tool-usersuspension-container">';
     echo '<div>';
-    \tool_usersuspension\util::print_view_tabs(array(), 'testfromfolder');
+    \tool_usersuspension\util::print_view_tabs([], 'testfromfolder');
     echo '</div>';
     write_actiontype_links($thispageurl);
 
@@ -140,7 +140,7 @@ if (!in_array($actiontype, $actiontypes)) {
     echo $OUTPUT->header();
     echo '<div class="tool-usersuspension-container">';
     echo '<div>';
-    \tool_usersuspension\util::print_view_tabs(array(), 'testfromfolder');
+    \tool_usersuspension\util::print_view_tabs([], 'testfromfolder');
     echo '</div>';
     write_actiontype_links($thispageurl);
 

@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,14 +33,14 @@ require_once($CFG->libdir.'/adminlib.php');
 admin_externalpage_setup('toolusersuspension');
 $context       = \context_system::instance();
 
-$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/notifications.php', array());
+$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/notifications.php', []);
 
 require_capability('tool/usersuspension:administration', $context);
 
 echo $OUTPUT->header();
 echo '<div class="tool-usersuspension-container">';
 echo '<div>';
-\tool_usersuspension\util::print_view_tabs(array(), 'notifications');
+\tool_usersuspension\util::print_view_tabs([], 'notifications');
 echo '</div>';
 echo '<div>' . get_string('page:view:notifications.php:introduction', 'tool_usersuspension') . '</div>';
 echo \tool_usersuspension\util::generate_notifications();

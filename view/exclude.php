@@ -23,7 +23,7 @@
  * @package     tool_usersuspension
  *
  * @copyright   Sebsoft.nl
- * @author      R.J. van Dongen <rogier@sebsoft.nl>
+ * @author      RvD <helpdesk@sebsoft.nl>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +33,7 @@ require_once($CFG->libdir.'/adminlib.php');
 admin_externalpage_setup('toolusersuspension');
 $context       = \context_system::instance();
 
-$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php', array());
+$thispageurl = new moodle_url('/' . $CFG->admin . '/tool/usersuspension/view/exclude.php', []);
 
 require_capability('tool/usersuspension:administration', $context);
 
@@ -43,7 +43,7 @@ if ($action === 'delete') {
     require_capability('moodle/user:update', context_system::instance());
     require_sesskey();
     $id = required_param('id', PARAM_INT);
-    $DB->delete_records('tool_usersuspension_excl', array('id' => $id));
+    $DB->delete_records('tool_usersuspension_excl', ['id' => $id]);
     redirect($thispageurl, get_string('msg:exclusion:records:deleted', 'tool_usersuspension'), 5);
 } else if ($action === 'add') {
     require_capability('moodle/user:update', context_system::instance());
@@ -62,7 +62,7 @@ if ($action === 'delete') {
     echo $OUTPUT->header();
     echo '<div class="tool-usersuspension-container">';
     echo '<div>';
-    \tool_usersuspension\util::print_view_tabs(array(), 'exclusions');
+    \tool_usersuspension\util::print_view_tabs([], 'exclusions');
     echo '</div>';
     echo '<div>' . get_string('page:view:exclude.php:introduction', 'tool_usersuspension') . '</div>';
     $table = new \tool_usersuspension\exclusiontable();

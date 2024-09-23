@@ -1,3 +1,11 @@
+Version 4.0.2 (build 2024090100)
+* integrated changes from https://github.com/sebsoftnl/moodle-tool_usersuspension/pull/7
+  Thanks, Gemma (https://github.com/gemguardian)
+* integrated changes from https://github.com/sebsoftnl/moodle-tool_usersuspension/pull/9
+  Thanks Nejc / AttackVectorDelta
+* integrated changes from https://github.com/sebsoftnl/moodle-tool_usersuspension/pull/13
+  Thanks Melvyn Gómez (https://github.com/melvyng)
+
 Version 4.0.1 (build 2022090102)
 * Fix for set_config from projectbadger: Fixes lastrun config and smart detection.
 * Update to English strings from Nejc / AttackVectorDelta
