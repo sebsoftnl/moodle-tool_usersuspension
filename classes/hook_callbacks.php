@@ -37,7 +37,7 @@ class hook_callbacks {
     /**
      * Callback to recover $SESSION->wantsurl.
      *
-     * @param \core_user\hook\after_login_completed $hook
+     * @param \core\hook\output\before_http_headers $hook
      */
     public static function before_http_headers(
             \core\hook\output\before_http_headers $hook,
