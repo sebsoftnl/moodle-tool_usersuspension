@@ -64,7 +64,13 @@ class deleteusers extends \core\task\scheduled_task {
             mtrace(get_string('config:cleanup:disabled', 'tool_usersuspension'));
             return false;
         }
-        \tool_usersuspension\util::delete_suspended_users();
+
+        $result = false;
+        $result = $result || \tool_usersuspension\util::delete_suspended_users();
+
+        if ($result) {
+            \tool_usersuspension\util::set_lastrun_config('cleanup');
+        }
     }
 
 }

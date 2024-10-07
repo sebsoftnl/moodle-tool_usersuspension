@@ -251,18 +251,20 @@ class util {
         if (!(bool)config::get('enablecleanup')) {
             return false;
         }
-        $lastrun = static::get_lastrun_config('cleanup', 0, true);
+        $lastrun = static::get_lastrun_config('cleanup', 0, false);
         $deltatime = time() - $lastrun;
         if ($deltatime < config::get('cleanup_interval')) {
             return false;
         }
         list($where, $params) = static::get_deletion_query(true);
         $sql = "SELECT * FROM {user} u WHERE $where";
-        $users = $DB->get_records_sql($sql, $params);
+        $users = $DB->get_recordset_sql($sql, $params);
         foreach ($users as $user) {
             // Delete user here.
             static::do_delete_user($user);
         }
+        $users->close();
+        return true;
     }
 
     /**
