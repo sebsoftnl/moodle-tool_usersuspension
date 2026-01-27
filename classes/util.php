@@ -303,7 +303,7 @@ class util {
         if (!is_siteadmin($user) && $USER->id != $user->id && $user->suspended != 1) {
             $user->suspended = 1;
             // Force logout.
-            \core\session\manager::kill_user_sessions($user->id);
+            \core\session\manager::destroy_user_sessions($user->id);
             user_update_user($user, false, true);
             // Process email if applicable.
             $user->suspended = 0; // This is to prevent mail from not sending.
@@ -367,7 +367,7 @@ class util {
         // Piece of code taken from /admin/user.php so we dance just like moodle does.
         if (!is_siteadmin($user) && $USER->id != $user->id && $user->deleted != 1) {
             // Force logout.
-            \core\session\manager::kill_user_sessions($user->id);
+            \core\session\manager::destroy_user_sessions($user->id);
             user_delete_user($user);
             // Process email id applicable.
             $user->suspended = 0; // This is to prevent mail from not sending.
