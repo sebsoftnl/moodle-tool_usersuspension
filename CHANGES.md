@@ -1,3 +1,9 @@
+Version 4.0.6.1 (build 2025120101)
+* Updated API call: replaced deprecated kill_user_sessions with destroy_user_sessions for Moodle compatibility
+  Thanks, Eugene Mamaev (mamaeves@mail.ru)
+
+----------
+
 Version 4.0.6 (build 2025120100)
 * Integrated PR#17 (https://github.com/sebsoftnl/moodle-tool_usersuspension/pull/17)
   Thanks, nersesov (https://github.com/nersesov)
